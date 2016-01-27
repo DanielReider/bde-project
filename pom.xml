@@ -4,7 +4,12 @@
   <artifactId>bde</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
+  <repositories>
+    <repository>
+      <id>MavenRepository</id>
+      <url>http://mvnrepository.com</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -18,7 +23,7 @@
       <version>2.7.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
+	<dependency>
 		<groupId>org.apache.hadoop</groupId>
 		<artifactId>hadoop-mapred</artifactId>
 		<version>0.22.0</version>
@@ -42,13 +47,6 @@
   
   <modules>
   	<module>twitchpull</module>
-
-  	
-  	
-  	
-  	
-  	
-  	
   	<module>weatherPull</module>
   </modules>
   
