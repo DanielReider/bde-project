@@ -111,7 +111,6 @@ class MapClass extends MapReduceBase implements
 								+ separator + mature + separator + updated
 								+ separator + fps);
 						output.collect(resKey, word);
-						System.out.println("writing");
 					}
 				}
 			}

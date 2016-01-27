@@ -21,16 +21,6 @@
         <checksumPolicy>fail</checksumPolicy>
       </snapshots>
     </repository>
-    <repository>
-      <id>cloudera</id>
-      <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>    
-    </repository>
   </repositories>
   
   <dependencies>
@@ -67,7 +57,9 @@
 		<version>20151123</version>
 	</dependency>
   </dependencies>
+  
   <modules>
   	<module>twitchpull</module>
   </modules>
+  
 </project>

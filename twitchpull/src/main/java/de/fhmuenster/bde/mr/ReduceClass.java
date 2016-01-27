@@ -20,7 +20,6 @@ class ReduceClass extends MapReduceBase implements
 
 		while (values.hasNext()) {
 			translations = values.next().toString();
-
 		}
 		result.set(translations);
 		output.collect(key, result);
