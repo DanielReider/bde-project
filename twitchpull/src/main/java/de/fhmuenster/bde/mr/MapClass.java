@@ -30,7 +30,7 @@ class MapClass extends MapReduceBase implements
 			throws IOException {
 		String line = value.toString();
 		String separator = "\t";
-		Boolean success = false; 
+		Boolean success = false;
 		int trys = 0;
 		StringBuffer response = null;
 
