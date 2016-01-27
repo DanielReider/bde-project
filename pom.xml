@@ -6,8 +6,19 @@
   <packaging>pom</packaging>
   <repositories>
     <repository>
-      <id>MavenRepository</id>
-      <url>http://mvnrepository.com</url>
+      <id>apache-releases</id>
+      <url>https://repository.apache.org/content/repositories/releases/</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>never</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
     </repository>
   </repositories>
   <dependencies>
