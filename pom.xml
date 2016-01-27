@@ -4,8 +4,43 @@
   <artifactId>bde</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-client</artifactId>
+      <version>2.7.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+		<groupId>org.apache.hadoop</groupId>
+		<artifactId>hadoop-mapred</artifactId>
+		<version>0.22.0</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.hadoop</groupId>
+		<artifactId>hadoop-common</artifactId>
+		<version>2.7.1</version>
+	</dependency>
+	<dependency>
+		<groupId>log4j</groupId>
+		<artifactId>log4j</artifactId>
+		<version>1.2.17</version>
+	</dependency>
+<dependency>
+		<groupId>org.json</groupId>
+		<artifactId>json</artifactId>
+		<version>20151123</version>
+	</dependency>
+  </dependencies>
+  
   <modules>
-  	
   	<module>twitchpull</module>
 
   	
@@ -16,4 +51,5 @@
   	
   	<module>weatherPull</module>
   </modules>
+  
 </project>
