@@ -14,12 +14,14 @@ import java.util.Enumeration;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
+
+
 
 public class TwitchPull {
 	public void run() throws Exception {
