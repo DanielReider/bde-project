@@ -1,5 +1,6 @@
 package de.fhms.bde.weatherPull;
 
+import java.io.File;
 import java.util.Calendar;
 
 import org.apache.hadoop.conf.Configuration;
