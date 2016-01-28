@@ -16,12 +16,13 @@ public class App
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+    	double roundOff = Math.round(10.444444 * 100.0) / 100.0;
+        System.out.println( "Hello World!: " + roundOff );
         weatherTest();
     }
     
     public static void weatherTest(){
-    	String concatURL = "http://api.openweathermap.org/data/2.5/weather?q="+ "49479" +",DE&appid=58c42f4cf0f253c2f5ae3f28adc0505c";
+    	String concatURL = "http://api.openweathermap.org/data/2.5/weather?q="+ "Muenchen" +",DE&appid=58c42f4cf0f253c2f5ae3f28adc0505c";
 		
     	URL url;
 		try {
@@ -47,7 +48,7 @@ public class App
 		String windSpeed = obj.getJSONObject("wind").getString("speed");
 
 
-		System.out.println(weather + "," + windSpeed + "," + tempInKelvin);
+		System.out.println(weather + "," + windSpeed + "," + (tempInKelvin-273));
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();

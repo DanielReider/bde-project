@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.Enumeration;
 
 import org.apache.hadoop.io.LongWritable;
@@ -67,7 +68,7 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 
 			double tempInCelsius = KelvinToCelsius(tempInKelvin);
 			this.place.set(place);
-			weatherInfo.set(weather + " " + windSpeed + " " + tempInCelsius);
+			weatherInfo.set(weather + "," + windSpeed + "," + tempInCelsius);
 			System.out.println("Log:" + weatherInfo.toString());
 			context.write(this.place, weatherInfo);
 		} catch (JSONException e1) {
@@ -77,7 +78,8 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 	}
 
 	private static double KelvinToCelsius(double tempInKelvin) {
-		return tempInKelvin - 273;
+    	double roundOff = Math.round((tempInKelvin-273) * 100.0) / 100.0;
+		return roundOff;
 	}
 }
 

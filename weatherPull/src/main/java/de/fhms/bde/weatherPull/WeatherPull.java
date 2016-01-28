@@ -19,7 +19,7 @@ public class WeatherPull extends Configured implements Tool {
 		job.setJobName("weatherPull");
 		job.setJarByClass(this.getClass());
 		Configuration conf = job.getConfiguration();
-		conf.set("mapreduce.output.textoutputformat.separator", ";");
+		conf.set("mapreduce.output.textoutputformat.separator", ",");
 		Calendar now = Calendar.getInstance();
 
 		String inputPath = "hdfs://quickstart.cloudera:8020/data/weather/input/places.csv";
@@ -38,7 +38,7 @@ public class WeatherPull extends Configured implements Tool {
 
 		// the keys are words (strings)
 		job.setOutputKeyClass(Text.class);
-		// the values are counts (ints)
+		// the values are returned
 		job.setOutputValueClass(Text.class);
 
 		job.setMapperClass(MapClass.class);
