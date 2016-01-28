@@ -27,7 +27,7 @@ public class WeatherPull extends Configured implements Tool {
 			stringBuilder.append("hdfs://quickstart.cloudera:8020/data/weather/processing/");
 			stringBuilder.append(now.get(Calendar.YEAR));
 			stringBuilder.append("/");
-			stringBuilder.append(now.get(Calendar.MONTH));
+			stringBuilder.append(now.get(Calendar.MONTH)+1);
 			stringBuilder.append("/");
 			stringBuilder.append(now.get(Calendar.DAY_OF_MONTH));
 			stringBuilder.append("/");
