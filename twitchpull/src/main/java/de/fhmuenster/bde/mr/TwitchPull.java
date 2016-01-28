@@ -7,44 +7,38 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Enumeration;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.json.JSONObject;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.codehaus.jettison.json.JSONObject;
 
 
 
-public class TwitchPull {
-	public void run() throws Exception {
-		JobConf conf = new JobConf(TwitchPull.class);
-		conf.setJobName("twitchPull");
+public class TwitchPull extends Configured implements Tool{
+	
+	@Override
+	public int run(String[] args) throws Exception {
+		Job job = Job.getInstance();
+		job.setJobName("twitchpull");
+		job.setJarByClass(this.getClass());
+		
+		Configuration conf = job.getConfiguration();
+
+		conf.set("mapreduce.output.textoutputformat.separator", ";");
 		String twitchURL = "https://api.twitch.tv/kraken/streams?limit=#limit#&offset=#offset#";
 				
-		Enumeration<NetworkInterface> e = NetworkInterface
-				.getNetworkInterfaces();
-		while (e.hasMoreElements()) {
-			NetworkInterface n = (NetworkInterface) e.nextElement();
-			Enumeration<InetAddress> ee = n.getInetAddresses();
-			while (ee.hasMoreElements()) {
-				InetAddress i = (InetAddress) ee.nextElement();
-				if (i.getHostAddress().toString().equals("10.60.64.45")) {
-					System.out.println("Setting proxy");
-					System.setProperty("http.proxyHost", "10.60.17.102");
-					System.setProperty("http.proxyPort", "8080");
-					System.setProperty("https.proxyHost", "10.60.17.102");
-					System.setProperty("https.proxyPort", "8080");
-				}
-			}
-		}
+		setProxyIfNeeded();
 
 		try {
 			Path linksPath = new Path(
@@ -69,8 +63,8 @@ public class TwitchPull {
 			in.close();
 
 			JSONObject obj = new JSONObject(response.toString());
-
-			int total = obj.getBigInteger("_total").intValue();
+			
+			int total = obj.getInt("_total");
 			int offset = 0;
 			while (total > offset) {
 				br.write(twitchURL.replace("#limit#", "100").replace(
@@ -81,20 +75,19 @@ public class TwitchPull {
 			}
 
 			br.close();
+			
+			job.setOutputKeyClass(Text.class);
+			job.setOutputValueClass(Text.class);
+			
+			job.setMapperClass(MapClass.class);
 
-			conf.setOutputKeyClass(Text.class);
-			conf.setOutputValueClass(Text.class);
+			job.setReducerClass(ReduceClass.class);
 
-			conf.setMapperClass(MapClass.class);
-
-			conf.setReducerClass(ReduceClass.class);
-
-			// conf.setWorkingDirectory(new Path("/temp"));
-
-			FileInputFormat.addInputPath(conf, linksPath);
+			FileInputFormat.addInputPath(job, linksPath);
 			Calendar cal = Calendar.getInstance();
+
 			FileOutputFormat.setOutputPath(
-					conf,
+					job,
 					new Path("/data/twitch/streammetadata/processing/"
 							+ cal.get(Calendar.YEAR) + "/"
 							+ cal.get(Calendar.MONTH) + 1 + "/"
@@ -102,17 +95,36 @@ public class TwitchPull {
 							+ cal.get(Calendar.HOUR_OF_DAY) + "/"
 							+ cal.get(Calendar.MINUTE)));
 
-			JobClient.runJob(conf);
+			return job.waitForCompletion(true) ? 0 : 1;
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			return 1;
 		}
 
+	}
+
+	private void setProxyIfNeeded() throws SocketException {
+		Enumeration<NetworkInterface> e = NetworkInterface
+				.getNetworkInterfaces();
+		while (e.hasMoreElements()) {
+			NetworkInterface n = (NetworkInterface) e.nextElement();
+			Enumeration<InetAddress> ee = n.getInetAddresses();
+			while (ee.hasMoreElements()) {
+				InetAddress i = (InetAddress) ee.nextElement();
+				if (i.getHostAddress().toString().equals("10.60.64.45")) {
+					System.setProperty("http.proxyHost", "10.60.17.102");
+					System.setProperty("http.proxyPort", "8080");
+					System.setProperty("https.proxyHost", "10.60.17.102");
+					System.setProperty("https.proxyPort", "8080");
+				}
+			}
+		}
 	}
 
 	public static void main(String[] args) {
 		TwitchPull dict = new TwitchPull();
 		try {
-			dict.run();
+			dict.run(args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

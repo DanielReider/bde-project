@@ -12,7 +12,8 @@ import java.util.Enumeration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.json.JSONObject;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -56,17 +57,23 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 			response.append(inputLine);
 		}
 		in.close();
-		JSONObject obj = new JSONObject(response.toString());
-		String weather = obj.getJSONArray("weather").getJSONObject(0)
-				.get("main").toString();
-		double tempInKelvin = obj.getJSONObject("main").getDouble("temp");
-		String windSpeed = obj.getJSONObject("wind").get("speed").toString();
+		JSONObject obj;
+		try {
+			obj = new JSONObject(response.toString());
+			String weather = obj.getJSONArray("weather").getJSONObject(0)
+					.get("main").toString();
+			double tempInKelvin = obj.getJSONObject("main").getDouble("temp");
+			String windSpeed = obj.getJSONObject("wind").get("speed").toString();
 
-		double tempInCelsius = KelvinToCelsius(tempInKelvin);
-		this.place.set(place);
-		weatherInfo.set(weather + " " + windSpeed + " " + tempInCelsius);
-		System.out.println("Log:" + weatherInfo.toString());
-		context.write(this.place, weatherInfo);
+			double tempInCelsius = KelvinToCelsius(tempInKelvin);
+			this.place.set(place);
+			weatherInfo.set(weather + " " + windSpeed + " " + tempInCelsius);
+			System.out.println("Log:" + weatherInfo.toString());
+			context.write(this.place, weatherInfo);
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+		
 	}
 
 	private static double KelvinToCelsius(double tempInKelvin) {
