@@ -25,7 +25,7 @@ public class WeatherPull {
 			stringBuilder.append("/");
 			stringBuilder.append(now.get(Calendar.DAY_OF_MONTH));
 			stringBuilder.append("/");
-			stringBuilder.append(now.get(Calendar.HOUR));
+			stringBuilder.append(now.get(Calendar.HOUR_OF_DAY));
 			stringBuilder.append("/");
 			stringBuilder.append(now.get(Calendar.MINUTE));
 			String outputPath = stringBuilder.toString();

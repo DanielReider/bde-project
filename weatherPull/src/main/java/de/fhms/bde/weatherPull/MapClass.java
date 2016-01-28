@@ -65,9 +65,9 @@ class MapClass extends MapReduceBase implements Mapper<Text, Text, Text, Text> {
 		String windSpeed = obj.getJSONObject("wind").getString("speed");
 
 		double tempInCelsius = KelvinToCelsius(tempInKelvin);
-
 		this.place.set(place);
 		weatherInfo.set(weather + " " + windSpeed + " " + tempInCelsius);
+		System.out.println(weatherInfo);
 		output.collect(this.place, weatherInfo);
 	}
 
