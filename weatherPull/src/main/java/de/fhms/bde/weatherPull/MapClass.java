@@ -9,20 +9,18 @@ import java.net.NetworkInterface;
 import java.net.URL;
 import java.util.Enumeration;
 
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.json.JSONObject;
 
-class MapClass extends MapReduceBase implements Mapper<Text, Text, Text, Text> {
+class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 
 	private Text place = new Text();
 	private Text weatherInfo = new Text();
 	
-	public void map(Text key, Text value, OutputCollector<Text, Text> output,
-			Reporter reporter) throws IOException {
+	@Override
+	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
 		Enumeration<NetworkInterface> e = NetworkInterface
 				.getNetworkInterfaces();
@@ -62,13 +60,13 @@ class MapClass extends MapReduceBase implements Mapper<Text, Text, Text, Text> {
 		String weather = obj.getJSONArray("weather").getJSONObject(0)
 				.get("main").toString();
 		double tempInKelvin = obj.getJSONObject("main").getDouble("temp");
-		String windSpeed = obj.getJSONObject("wind").getString("speed");
+		String windSpeed = obj.getJSONObject("wind").get("speed").toString();
 
 		double tempInCelsius = KelvinToCelsius(tempInKelvin);
 		this.place.set(place);
 		weatherInfo.set(weather + " " + windSpeed + " " + tempInCelsius);
-		System.out.println(weatherInfo);
-		output.collect(this.place, weatherInfo);
+		System.out.println("Log:" + weatherInfo.toString());
+		context.write(this.place, weatherInfo);
 	}
 
 	private static double KelvinToCelsius(double tempInKelvin) {
