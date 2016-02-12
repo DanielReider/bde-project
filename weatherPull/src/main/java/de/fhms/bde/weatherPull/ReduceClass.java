@@ -1,24 +1,26 @@
 package de.fhms.bde.weatherPull;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapred.MapReduceBase;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reducer;
+import org.apache.hadoop.mapred.Reporter;
 
-
-class ReduceClass extends Reducer<Text, Text, Text, Text> {
+class ReduceClass extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 	private Text result = new Text();
-	
-	@Override
-	public void reduce(Text key, Iterable<Text> values, Context context)
-			throws IOException, InterruptedException {
+
+	public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter)
+			throws IOException {
 		String translations = "";
 
-		for (Text value: values) {
-			translations = value.toString();
+		while (values.hasNext()) {
+			translations = values.next().toString();
 
 		}
 		result.set(translations);
-		context.write(key, result);
+		output.collect(key, result);
 	}
 }

@@ -7,22 +7,22 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.Enumeration;
 
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.apache.hadoop.mapred.MapReduceBase;
+import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
+import org.json.JSONObject;
 
-class MapClass extends Mapper<LongWritable, Text, Text, Text> {
+class MapClass extends MapReduceBase implements Mapper<Text, Text, Text, Text> {
 
 	private Text place = new Text();
 	private Text weatherInfo = new Text();
 	
-	@Override
-	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+	public void map(Text key, Text value, OutputCollector<Text, Text> output,
+			Reporter reporter) throws IOException {
 
 		Enumeration<NetworkInterface> e = NetworkInterface
 				.getNetworkInterfaces();
@@ -58,28 +58,21 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 			response.append(inputLine);
 		}
 		in.close();
-		JSONObject obj;
-		try {
-			obj = new JSONObject(response.toString());
-			String weather = obj.getJSONArray("weather").getJSONObject(0)
-					.get("main").toString();
-			double tempInKelvin = obj.getJSONObject("main").getDouble("temp");
-			String windSpeed = obj.getJSONObject("wind").get("speed").toString();
+		JSONObject obj = new JSONObject(response.toString());
+		String weather = obj.getJSONArray("weather").getJSONObject(0)
+				.get("main").toString();
+		double tempInKelvin = obj.getJSONObject("main").getDouble("temp");
+		String windSpeed = obj.getJSONObject("wind").getString("speed");
 
-			double tempInCelsius = KelvinToCelsius(tempInKelvin);
-			this.place.set(place);
-			weatherInfo.set(weather + "," + windSpeed + "," + tempInCelsius);
-			System.out.println("Log:" + weatherInfo.toString());
-			context.write(this.place, weatherInfo);
-		} catch (JSONException e1) {
-			e1.printStackTrace();
-		}
-		
+		double tempInCelsius = KelvinToCelsius(tempInKelvin);
+		this.place.set(place);
+		weatherInfo.set(weather + " " + windSpeed + " " + tempInCelsius);
+		System.out.println(weatherInfo);
+		output.collect(this.place, weatherInfo);
 	}
 
 	private static double KelvinToCelsius(double tempInKelvin) {
-    	double roundOff = Math.round((tempInKelvin-273) * 100.0) / 100.0;
-		return roundOff;
+		return tempInKelvin - 273;
 	}
 }
 
