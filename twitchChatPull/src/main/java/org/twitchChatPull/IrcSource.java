@@ -267,7 +267,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 				if (i.getHostAddress().toString().equals("10.60.64.45")) {
 					System.out.println("Setting proxy");
 					System.setProperty("socksProxyHost", "10.60.17.102");
-					System.setProperty("socksProxyPort", "8080");
+					System.setProperty("socksProxyPort", "1080");
 					
 				}
 			}
