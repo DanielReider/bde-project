@@ -106,7 +106,7 @@ public class TwitchPull extends Configured implements Tool{
 					job,
 					new Path("/data/twitch/streammetadata/processing/"
 							+ cal.get(Calendar.YEAR) + "/"
-							+ (cal.get(Calendar.MONTH) + 1) + "/"
+							+ (cal.get(Calendar.MONTH) + 1)  + "/"
 							+ cal.get(Calendar.DAY_OF_MONTH) + "/"
 							+ cal.get(Calendar.HOUR_OF_DAY) + "/"
 							+ cal.get(Calendar.MINUTE)));
