@@ -238,19 +238,17 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
     	logger.debug(
     	"Creating new connection to hostname:{} port:{}",
 	      hostname, port);
-	  
     	IRCConfig config = IRCConfigBuilder.newBuilder()
 	      .host(hostname)
 	      .port(port)
-	      .nick(nick)
 	      .username(user)
-	      .realname(name)
 	      .password(password)
 	      .encoding("UTF-8")
 	      .autoPong(true)
 	      .stripColors(false)
 	      .socksProxy(proxyHost, proxyPort)
 	      .build();
+    	
     	logger.info("config erstellt");
     	IRCConnection connection = IRCConnectionFactory.newConnection(config);
     	logger.info("Connection erstellt");
