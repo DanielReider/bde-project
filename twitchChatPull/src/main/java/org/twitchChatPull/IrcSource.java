@@ -273,6 +273,8 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 			}
 		}
 		createConnection();
+		System.setProperty("socksProxyHost", null);
+		System.setProperty("socksProxyPort", null);
     } catch (Exception e) {
       logger.error("Unable to create irc client using hostname:"
           + hostname + " port:" + port + ". Exception follows.", e);
