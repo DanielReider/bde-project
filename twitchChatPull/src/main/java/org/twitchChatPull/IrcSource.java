@@ -39,6 +39,8 @@ import org.apache.flume.channel.ChannelProcessor;
 import org.apache.flume.conf.Configurable;
 import org.apache.flume.event.EventBuilder;
 import org.apache.flume.source.AbstractSource;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.schwering.irc.lib.IRCConfig;
 import org.schwering.irc.lib.IRCConfigBuilder;
 import org.schwering.irc.lib.IRCConnection;
@@ -48,9 +50,6 @@ import org.schwering.irc.lib.IRCUser;
 import org.schwering.irc.lib.util.IRCModeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.google.common.base.Preconditions;
 
@@ -249,7 +248,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 	      .socksProxy(proxyHost, proxyPort)
 	      .build();
     	
-    	logger.info("config erstellt");
+    	logger.info("config erstellt" + config.getHost() + config.getUsername());
     	IRCConnection connection = IRCConnectionFactory.newConnection(config);
     	logger.info("Connection erstellt");
     	connection.addIRCEventListener(new IRCConnectionListener());
