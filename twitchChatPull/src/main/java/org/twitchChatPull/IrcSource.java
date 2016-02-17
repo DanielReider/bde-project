@@ -296,7 +296,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 				if (i.getHostAddress().toString().equals("10.60.64.45")) {
 					System.out.println("Setting proxy");
 					proxyHost = "10.60.17.102";
-					proxyPort = 3128;
+					proxyPort = 7300;
 				}
 			}
 		}
