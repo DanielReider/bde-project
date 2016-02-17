@@ -248,7 +248,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 	      .socksProxy(proxyHost, proxyPort)
 	      .build();
     	
-    	logger.info("config erstellt" + config.getHost() +  config.getNick());
+    	logger.info("config erstellt " + config.getHost() + ","+ config.getNick() );
     	IRCConnection connection = IRCConnectionFactory.newConnection(config,config);
     	logger.info("Connection erstellt");
     	connection.addIRCEventListener(new IRCConnectionListener());
@@ -296,7 +296,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 				if (i.getHostAddress().toString().equals("10.60.64.45")) {
 					System.out.println("Setting proxy");
 					proxyHost = "10.60.17.102";
-					proxyPort = 1080;
+					proxyPort = 8080;
 				}
 			}
 		}
