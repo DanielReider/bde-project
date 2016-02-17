@@ -19,10 +19,13 @@ package org.twitchChatPull;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.Enumeration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -254,7 +257,22 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
     mChannel = getChannelProcessor();
 
     try {
-      createConnection();
+		Enumeration<NetworkInterface> e = NetworkInterface
+				.getNetworkInterfaces();
+		while (e.hasMoreElements()) {
+			NetworkInterface n = (NetworkInterface) e.nextElement();
+			Enumeration<InetAddress> ee = n.getInetAddresses();
+			while (ee.hasMoreElements()) {
+				InetAddress i = (InetAddress) ee.nextElement();
+				if (i.getHostAddress().toString().equals("10.60.64.45")) {
+					System.out.println("Setting proxy");
+					System.setProperty("socksProxyHost", "10.60.17.102");
+					System.setProperty("socksProxyPort", "1080");
+					
+				}
+			}
+		}
+		createConnection();
     } catch (Exception e) {
       logger.error("Unable to create irc client using hostname:"
           + hostname + " port:" + port + ". Exception follows.", e);

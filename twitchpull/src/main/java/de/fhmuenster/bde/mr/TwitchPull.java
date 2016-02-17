@@ -12,21 +12,29 @@ import java.util.Calendar;
 import java.util.Enumeration;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.json.JSONObject;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.codehaus.jettison.json.JSONObject;
 
 
 
-public class TwitchPull {
-	public void run() throws Exception {
-		JobConf conf = new JobConf(TwitchPull.class);
-		conf.setJobName("twitchPull");
+public class TwitchPull extends Configured implements Tool{
+	
+	
+	public int run(String[] arg0) throws Exception{
+		Job job = Job.getInstance();
+		job.setJobName("twitchMetaDataPull");
+		job.setJarByClass(this.getClass());
+		
+		Configuration conf = job.getConfiguration();
+		conf.set("mapreduce.output.textoutputformat.separator", ";");
+		
 		String twitchURL = "https://api.twitch.tv/kraken/streams?limit=#limit#&offset=#offset#";
 				
 		Enumeration<NetworkInterface> e = NetworkInterface
@@ -70,7 +78,7 @@ public class TwitchPull {
 
 			JSONObject obj = new JSONObject(response.toString());
 
-			int total = obj.getBigInteger("_total").intValue();
+			int total = obj.getInt("_total");
 			int offset = 0;
 			while (total > offset) {
 				br.write(twitchURL.replace("#limit#", "100").replace(
@@ -82,37 +90,41 @@ public class TwitchPull {
 
 			br.close();
 
-			conf.setOutputKeyClass(Text.class);
-			conf.setOutputValueClass(Text.class);
+			job.setOutputKeyClass(Text.class);
+			job.setOutputValueClass(Text.class);
 
-			conf.setMapperClass(MapClass.class);
+			
+			job.setMapperClass(MapClass.class);
 
-			conf.setReducerClass(ReduceClass.class);
+			job.setReducerClass(ReduceClass.class);
 
 			// conf.setWorkingDirectory(new Path("/temp"));
 
-			FileInputFormat.addInputPath(conf, linksPath);
+			FileInputFormat.addInputPath(job, linksPath);
 			Calendar cal = Calendar.getInstance();
 			FileOutputFormat.setOutputPath(
-					conf,
+					job,
 					new Path("/data/twitch/streammetadata/processing/"
 							+ cal.get(Calendar.YEAR) + "/"
-							+ cal.get(Calendar.MONTH) + 1 + "/"
+							+ (cal.get(Calendar.MONTH) + 1 )  + "/"
 							+ cal.get(Calendar.DAY_OF_MONTH) + "/"
 							+ cal.get(Calendar.HOUR_OF_DAY) + "/"
 							+ cal.get(Calendar.MINUTE)));
 
-			JobClient.runJob(conf);
+			
+			return job.waitForCompletion(true) ? 0: 1;
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			return 0;
 		}
 
 	}
 
 	public static void main(String[] args) {
-		TwitchPull dict = new TwitchPull();
+		TwitchPull twitchPull = new TwitchPull();
 		try {
-			dict.run();
+			twitchPull.run(args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
