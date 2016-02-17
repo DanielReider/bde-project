@@ -23,7 +23,7 @@ public class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 
 	public void map(LongWritable key, Text value, Context context) throws IOException {
 		String line = value.toString();
-		String separator = "\t";
+		String separator = ";";
 		Boolean success = false;
 		int trys = 0;
 		StringBuffer response = null;
@@ -76,15 +76,15 @@ public class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				String currentDate = formatter.format(new Date());
 				for (int i = 0; i < arr.length(); i++) {
-					String streamId = arr.getJSONObject(i).get("_id").toString();
-					String viewers = arr.getJSONObject(i).get("viewers").toString();
+					String streamId = arr.getJSONObject(i).get("_id").toString().replace(separator, "");
+					String viewers = arr.getJSONObject(i).get("viewers").toString().replace(separator, "");
 					JSONObject channel = arr.getJSONObject(i).getJSONObject("channel");
 					if (channel != null) {
-						String game = channel.get("game").toString();
-						String name = channel.get("name").toString();
-						String status = channel.get("status").toString();
-						String mature = channel.get("mature").toString();
-						Object updated = channel.get("updated_at");
+						String game = channel.get("game").toString().replace(separator, "");
+						String name = channel.get("name").toString().replace(separator, "");
+						String status = channel.get("status").toString().replace(separator, "");
+						String mature = channel.get("mature").toString().replace(separator, "");
+						String updated = channel.get("updated_at").toString().replace(separator, "");
 						Double fps = arr.getJSONObject(i).getDouble("average_fps");
 
 						if (mature == null)
