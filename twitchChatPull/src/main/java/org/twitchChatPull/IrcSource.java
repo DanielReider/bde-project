@@ -172,9 +172,9 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 	                URLEncoder.encode(msg, charset),
 	                URLEncoder.encode("json", charset));
 			StringBuilder jsonResults = new StringBuilder();
-	        URLConnection connection = new URL(API_URL + "?" + query).openConnection();
-	        connection.setRequestProperty("Accept-Charset", charset);
-	        InputStreamReader in = new InputStreamReader(connection.getInputStream());
+	        URLConnection urlconnection = new URL(API_URL + "?" + query).openConnection();
+	        urlconnection.setRequestProperty("Accept-Charset", charset);
+	        InputStreamReader in = new InputStreamReader(urlconnection.getInputStream());
 	        // Load the results into a StringBuilder
 	        int read;
 	        char[] buff = new char[1024];
@@ -198,7 +198,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 			            break;
 		            }	
 	            }
-	            eventString = eventString + "," + sentiment.toString();
+	            eventString = chan.replace("#", "") + "," + eventString + "," + sentiment.toString();
 	            logger.info(eventString);
 	            Event event = EventBuilder.withBody(eventString, mCharset);
 			    mChannel.processEvent(event);
