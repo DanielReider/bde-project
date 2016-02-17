@@ -41,6 +41,7 @@ import org.schwering.irc.lib.IRCConnection;
 import org.schwering.irc.lib.IRCEventListener;
 import org.schwering.irc.lib.IRCModeParser;
 import org.schwering.irc.lib.IRCUser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -266,15 +267,13 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 				InetAddress i = (InetAddress) ee.nextElement();
 				if (i.getHostAddress().toString().equals("10.60.64.45")) {
 					System.out.println("Setting proxy");
-					System.setProperty("socksProxyHost", "10.60.17.102");
-					System.setProperty("socksProxyPort", "1080");
+					System.setProperty("socksProxyHost", "{10.60.17.102}");
+					System.setProperty("socksProxyPort", "{1080}");
 					
 				}
 			}
 		}
 		createConnection();
-		System.setProperty("socksProxyHost", null);
-		System.setProperty("socksProxyPort", null);
     } catch (Exception e) {
       logger.error("Unable to create irc client using hostname:"
           + hostname + " port:" + port + ". Exception follows.", e);
