@@ -251,13 +251,17 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 	      .stripColors(false)
 	      .socksProxy(proxyHost, proxyPort)
 	      .build();
-	  
+    	logger.info("config erstellt");
     	IRCConnection connection = IRCConnectionFactory.newConnection(config);
+    	logger.info("Connection erstellt");
     	connection.addIRCEventListener(new IRCConnectionListener());
+    	logger.info("IRCListener erstellt");
 	
 		try {
 			connection.connect();
+			logger.info("Connected");
 			connection.doJoin(IRC_CHANNEL_PREFIX + chan);
+			logger.info("Join");
 		} catch (KeyManagementException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
