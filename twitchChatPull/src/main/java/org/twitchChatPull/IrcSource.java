@@ -249,7 +249,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 	      .build();
     	
     	logger.info("config erstellt" + config.getHost() +  config.getNick());
-    	IRCConnection connection = IRCConnectionFactory.newConnection(config);
+    	IRCConnection connection = IRCConnectionFactory.newConnection(config,config);
     	logger.info("Connection erstellt");
     	connection.addIRCEventListener(new IRCConnectionListener());
     	logger.info("IRCListener erstellt");
