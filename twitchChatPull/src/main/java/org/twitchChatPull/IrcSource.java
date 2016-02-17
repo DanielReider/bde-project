@@ -24,7 +24,9 @@ import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
+import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,10 +39,13 @@ import org.apache.flume.channel.ChannelProcessor;
 import org.apache.flume.conf.Configurable;
 import org.apache.flume.event.EventBuilder;
 import org.apache.flume.source.AbstractSource;
+import org.schwering.irc.lib.IRCConfig;
+import org.schwering.irc.lib.IRCConfigBuilder;
 import org.schwering.irc.lib.IRCConnection;
+import org.schwering.irc.lib.IRCConnectionFactory;
 import org.schwering.irc.lib.IRCEventListener;
-import org.schwering.irc.lib.IRCModeParser;
 import org.schwering.irc.lib.IRCUser;
+import org.schwering.irc.lib.util.IRCModeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,9 +74,13 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
   private String user;
   private String name;
   private String chan;
+  private String proxyHost;
+  private Integer proxyPort;
   
   private CounterGroup counterGroup;
   BlockingQueue<Event> q = new LinkedBlockingQueue<Event>();
+
+  private static Charset mCharset;
   
   static public class IRCConnectionListener implements IRCEventListener {
 
@@ -173,8 +182,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 	        while ((read = in.read(buff)) != -1) {
 	            jsonResults.append(buff, 0, read);
 	        }
-	        String timeStamp = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date());
-	        String eventString = timeStamp + ",'" + msg + "'";
+	        String eventString = msg.replace(",", ";");
 	        try {
 	            // Create a JSON object hierarchy from the results
 	            JSONObject jsonObj = new JSONObject(jsonResults.toString());
@@ -193,7 +201,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 	            }
 	            eventString = eventString + "," + sentiment.toString() + "\n";
 	            logger.info(eventString);
-	            Event event = EventBuilder.withBody(eventString.getBytes());
+	            Event event = EventBuilder.withBody(eventString, mCharset);
 			    mChannel.processEvent(event);
 	        } catch (JSONException e) {
 	            logger.info("Cannot process JSON results:" + e.getMessage());
@@ -227,18 +235,39 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 
   private void createConnection() throws IOException {
     if (connection == null) {
-      logger.debug(
-          "Creating new connection to hostname:{} port:{}",
-          hostname, port);
-      connection = new IRCConnection(hostname, new int[] { port },
-          password, nick, user, name);
-      connection.addIRCEventListener(new IRCConnectionListener());
-      connection.setEncoding("UTF-8");
-      connection.setPong(true);
-      connection.setDaemon(false);
-      connection.setColors(false);
-      connection.connect();
-      connection.send("join " + IRC_CHANNEL_PREFIX + chan);
+    	logger.debug(
+    	"Creating new connection to hostname:{} port:{}",
+	      hostname, port);
+    	IRCConfig config = IRCConfigBuilder.newBuilder()
+	      .host(hostname)
+	      .port(port)
+	      .username(user)
+	      .password(password)
+	      .encoding("UTF-8")
+	      .autoPong(true)
+	      .stripColors(false)
+	      .socksProxy(proxyHost, proxyPort)
+	      .build();
+    	
+    	logger.info("config erstellt");
+    	IRCConnection connection = IRCConnectionFactory.newConnection(config);
+    	logger.info("Connection erstellt");
+    	connection.addIRCEventListener(new IRCConnectionListener());
+    	logger.info("IRCListener erstellt");
+	
+		try {
+			connection.connect();
+			logger.info("Connected");
+			connection.doJoin(IRC_CHANNEL_PREFIX + chan);
+			logger.info("Join");
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	 
     }
   }
 
@@ -255,6 +284,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
   public void start() {
     logger.info("IRC source starting");
     mChannel = getChannelProcessor();
+    mCharset = Charset.forName("UTF-8");
 
     try {
 		Enumeration<NetworkInterface> e = NetworkInterface
@@ -266,9 +296,8 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 				InetAddress i = (InetAddress) ee.nextElement();
 				if (i.getHostAddress().toString().equals("10.60.64.45")) {
 					System.out.println("Setting proxy");
-					System.setProperty("socksProxyHost", "10.60.17.102");
-					System.setProperty("socksProxyPort", "1080");
-					
+					proxyHost = "10.60.17.102";
+					proxyPort = 1080;
 				}
 			}
 		}
