@@ -2,26 +2,35 @@ package de.fhms.bde.weatherPull;
 
 import java.util.Calendar;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
 
-public class WeatherPull {
+public class WeatherPull extends Configured implements Tool{
 	
-		public void run() throws Exception {
+	
+		public int run(String[] arg0) throws Exception {
+			Job job = Job.getInstance();
+			job.setJobName("twitchMetaDataPull");
+			job.setJarByClass(this.getClass());
+			
+			Configuration conf = job.getConfiguration();
+			conf.set("mapreduce.output.textoutputformat.separator", ",");
+			
 			Calendar now = Calendar.getInstance();
-
-			JobConf conf = new JobConf(WeatherPull.class);
+			
 			String inputPath = "hdfs://quickstart.cloudera:8020/data/weather/input/places.csv";
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.append("hdfs://quickstart.cloudera:8020/data/weather/processing/");
 			stringBuilder.append(now.get(Calendar.YEAR));
 			stringBuilder.append("/");
-			stringBuilder.append(now.get(Calendar.MONTH));
+			stringBuilder.append(now.get(Calendar.MONTH)+1);
 			stringBuilder.append("/");
 			stringBuilder.append(now.get(Calendar.DAY_OF_MONTH));
 			stringBuilder.append("/");
@@ -29,28 +38,26 @@ public class WeatherPull {
 			stringBuilder.append("/");
 			stringBuilder.append(now.get(Calendar.MINUTE));
 			String outputPath = stringBuilder.toString();
-			conf.setJobName("weatherPull");
 
 			// the keys are words (strings)
-			conf.setOutputKeyClass(Text.class);
+			job.setOutputKeyClass(Text.class);
 			// the values are counts (ints)
-			conf.setOutputValueClass(IntWritable.class);
+			job.setOutputValueClass(IntWritable.class);
 
-			conf.setMapperClass(MapClass.class);
-			conf.setReducerClass(ReduceClass.class);
+			job.setMapperClass(MapClass.class);
+			job.setReducerClass(ReduceClass.class);
 
-			FileInputFormat.addInputPath(conf, new Path(inputPath));
-			FileOutputFormat.setOutputPath(conf, new Path(outputPath));
+			FileInputFormat.addInputPath(job, new Path(inputPath));
+			FileOutputFormat.setOutputPath(job, new Path(outputPath));
 
-			JobClient.runJob(conf);
+			return job.waitForCompletion(true) ? 0: 1;
 		}
 
 		public static void main(String[] args) {
 			WeatherPull wp = new WeatherPull();
 			try {
-				wp.run();
+				wp.run(args);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

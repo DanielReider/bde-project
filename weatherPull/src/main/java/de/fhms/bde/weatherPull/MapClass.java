@@ -10,19 +10,15 @@ import java.net.URL;
 import java.util.Enumeration;
 
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.json.JSONObject;
 
-class MapClass extends MapReduceBase implements Mapper<Text, Text, Text, Text> {
+class MapClass extends Mapper<Text, Text, Text, Text> {
 
 	private Text place = new Text();
 	private Text weatherInfo = new Text();
 	
-	public void map(Text key, Text value, OutputCollector<Text, Text> output,
-			Reporter reporter) throws IOException {
+	public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
 
 		Enumeration<NetworkInterface> e = NetworkInterface
 				.getNetworkInterfaces();
@@ -68,7 +64,7 @@ class MapClass extends MapReduceBase implements Mapper<Text, Text, Text, Text> {
 		this.place.set(place);
 		weatherInfo.set(weather + " " + windSpeed + " " + tempInCelsius);
 		System.out.println(weatherInfo);
-		output.collect(this.place, weatherInfo);
+		context.write(this.place, weatherInfo);
 	}
 
 	private static double KelvinToCelsius(double tempInKelvin) {
