@@ -198,7 +198,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 			            break;
 		            }	
 	            }
-	            eventString = eventString + "," + sentiment.toString() + "\n";
+	            eventString = eventString + "," + sentiment.toString();
 	            logger.info(eventString);
 	            Event event = EventBuilder.withBody(eventString, mCharset);
 			    mChannel.processEvent(event);
@@ -240,7 +240,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
     	IRCConfig config = IRCConfigBuilder.newBuilder()
 	      .host(hostname)
 	      .port(port)
-	      .username(user)
+	      .nick(nick)
 	      .password(password)
 	      .encoding("UTF-8")
 	      .autoPong(true)
@@ -248,7 +248,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 	      .socksProxy(proxyHost, proxyPort)
 	      .build();
     	
-    	logger.info("config erstellt" + config.getHost() + config.getUsername());
+    	logger.info("config erstellt" + config.getHost() +  config.getNick());
     	IRCConnection connection = IRCConnectionFactory.newConnection(config);
     	logger.info("Connection erstellt");
     	connection.addIRCEventListener(new IRCConnectionListener());
