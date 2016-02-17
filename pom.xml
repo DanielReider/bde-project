@@ -26,11 +26,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-mapred</artifactId>
-			<version>0.22.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-common</artifactId>
 			<version>2.7.1</version>
 		</dependency>
@@ -56,5 +51,4 @@
 		<module>weatherPull</module>
 		<module>twitchChatPull</module>
 	</modules>
-
 </project>

@@ -17,7 +17,7 @@ public class WeatherPull extends Configured implements Tool{
 	
 		public int run(String[] arg0) throws Exception {
 			Job job = Job.getInstance();
-			job.setJobName("twitchMetaDataPull");
+			job.setJobName("WeatherDataPull");
 			job.setJarByClass(this.getClass());
 			
 			Configuration conf = job.getConfiguration();
@@ -39,10 +39,10 @@ public class WeatherPull extends Configured implements Tool{
 			stringBuilder.append(now.get(Calendar.MINUTE));
 			String outputPath = stringBuilder.toString();
 
-			// the keys are words (strings)
+			
 			job.setOutputKeyClass(Text.class);
-			// the values are counts (ints)
-			job.setOutputValueClass(IntWritable.class);
+			
+			job.setOutputValueClass(Text.class);
 
 			job.setMapperClass(MapClass.class);
 			job.setReducerClass(ReduceClass.class);
@@ -62,4 +62,3 @@ public class WeatherPull extends Configured implements Tool{
 			}
 		}
 	}
-
