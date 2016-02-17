@@ -63,7 +63,7 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
   private static final String API_KEY = "ba118ae867eb8c66d7cc76d6a32eb3ab4c341b04";
   private static final String API_URL = "http://gateway-a.watsonplatform.net/calls/text/TextGetTextSentiment";
 
-  private static IRCConnection connection = null;
+  private IRCConnection connection = null;
   static ChannelProcessor mChannel = null;
 
   private String hostname;
