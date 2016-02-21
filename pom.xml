@@ -81,8 +81,6 @@
 		<module>twitchpull</module>
 		<module>weatherPull</module>
 		<module>twitchChatPull</module>
-    	<module>userSGDAnalysis</module>
-    <module>randomForrest</module>
-    <module>randomForest</module>
+    	<module>randomForest</module>
   </modules>
 </project>
