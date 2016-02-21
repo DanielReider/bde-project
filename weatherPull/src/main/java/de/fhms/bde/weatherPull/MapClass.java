@@ -15,6 +15,12 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.json.JSONObject;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.util.Bytes;
+
 class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 
 	private Text place = new Text();
@@ -75,7 +81,7 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 
 				double tempInCelsius = KelvinToCelsius(tempInKelvin);
 				this.place.set(place);
-				weatherInfo = weather + " " + windSpeed + " " + tempInCelsius;
+				weatherInfo = weather + "," + windSpeed + "," + tempInCelsius;
 
 				Calendar now = Calendar.getInstance();
 
@@ -84,7 +90,9 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 						+ now.get(Calendar.HOUR_OF_DAY);
 
 				writtenData.set(generalData + "," + weatherInfo);
-				System.out.println(this.place);
+				
+				dataToHBase(generalData, this.place.toString(),weatherInfo);
+				
 				context.write(this.place, writtenData);
 			} catch (Exception e) {
 
@@ -95,5 +103,28 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 	private static double KelvinToCelsius(double tempInKelvin) {
 		tempInKelvin -= 273;
 		return (Math.round(tempInKelvin * 100.0)) / 100.0;
+	}
+	
+	private static void dataToHBase(String generalData, String plz, String content) throws IOException{
+		// Instantiating Configuration class
+	      Configuration config = HBaseConfiguration.create();
+
+	      // Instantiating HTable class
+	      HTable hTable = new HTable(config, "weather");
+
+	      // Instantiating Put class
+	      // accepts a row name.
+	      Put p = new Put(Bytes.toBytes(generalData)); 
+	   // adding values using add() method
+	      // accepts column family name, qualifier/row name ,value
+	      p.add(Bytes.toBytes("weather"),
+	      Bytes.toBytes(plz),Bytes.toBytes(content));
+	      
+	      // Saving the put Instance to the HTable.
+	      hTable.put(p);
+	      System.out.println("data inserted");
+	      
+	      // closing HTable
+	      hTable.close();
 	}
 }
