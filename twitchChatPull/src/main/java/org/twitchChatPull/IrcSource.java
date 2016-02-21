@@ -24,7 +24,7 @@ import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -43,16 +43,15 @@ import org.schwering.irc.lib.IRCModeParser;
 import org.schwering.irc.lib.IRCUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.common.base.Preconditions;
 
-public class IrcSource extends AbstractSource implements EventDrivenSource,
-		Configurable {
+public class IrcSource extends AbstractSource implements EventDrivenSource, Configurable {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(IrcSource.class);
+	private static final Logger logger = LoggerFactory.getLogger(IrcSource.class);
 
 	private static final int DEFAULT_PORT = 6667;
 	private static final String IRC_CHANNEL_PREFIX = "#";
@@ -74,8 +73,6 @@ public class IrcSource extends AbstractSource implements EventDrivenSource,
 	private CounterGroup counterGroup;
 	BlockingQueue<Event> q = new LinkedBlockingQueue<Event>();
 
-	private static Charset mCharset;
-
 	static public class IRCConnectionListener implements IRCEventListener {
 
 		public void onRegistered() {
@@ -94,37 +91,35 @@ public class IrcSource extends AbstractSource implements EventDrivenSource,
 		}
 
 		public void onInvite(String chan, IRCUser u, String nickPass) {
-			logger.info(chan + "> " + u.getNick() + " invites " + nickPass);
+			System.out.println(chan + "> " + u.getNick() + " invites " + nickPass);
 		}
 
 		public void onJoin(String chan, IRCUser u) {
-			logger.info(chan + "> " + u.getNick() + " joins");
+			System.out.println(chan + "> " + u.getNick() + " joins");
 		}
 
 		public void onKick(String chan, IRCUser u, String nickPass, String msg) {
-			logger.info(chan + "> " + u.getNick() + " kicks " + nickPass);
+			System.out.println(chan + "> " + u.getNick() + " kicks " + nickPass);
 		}
 
 		public void onMode(IRCUser u, String nickPass, String mode) {
-			logger.info("Mode: " + u.getNick() + " sets modes " + mode + " "
-					+ nickPass);
+			System.out.println("Mode: " + u.getNick() + " sets modes " + mode + " " + nickPass);
 		}
 
 		public void onMode(String chan, IRCUser u, IRCModeParser mp) {
-			logger.info(chan + "> " + u.getNick() + " sets mode: "
-					+ mp.getLine());
+			System.out.println(chan + "> " + u.getNick() + " sets mode: " + mp.getLine());
 		}
 
 		public void onNick(IRCUser u, String nickNew) {
-			logger.info("Nick: " + u.getNick() + " is now known as " + nickNew);
+			System.out.println("Nick: " + u.getNick() + " is now known as " + nickNew);
 		}
 
 		public void onNotice(String target, IRCUser u, String msg) {
-			logger.info(target + "> " + u.getNick() + " (notice): " + msg);
+			System.out.println(target + "> " + u.getNick() + " (notice): " + msg);
 		}
 
 		public void onPart(String chan, IRCUser u, String msg) {
-			logger.info(chan + "> " + u.getNick() + " parts");
+			System.out.println(chan + "> " + u.getNick() + " parts");
 		}
 
 		public void onPrivmsg(String chan, IRCUser u, String msg) {
@@ -132,21 +127,20 @@ public class IrcSource extends AbstractSource implements EventDrivenSource,
 			try {
 				append(chan, u.getNick(), msg);
 			} catch (IOException e) {
-				logger.info("Fail to create the event:" + e.getMessage());
+				System.out.println("Fail to create the event:" + e.getMessage());
 			}
 		}
 
 		public void onQuit(IRCUser u, String msg) {
-			logger.info("Quit: " + u.getNick());
+			System.out.println("Quit: " + u.getNick());
 		}
 
 		public void onReply(int num, String value, String msg) {
-			logger.info("Reply #" + num + ": " + value + " " + msg);
+			System.out.println("Reply #" + num + ": " + value + " " + msg);
 		}
 
 		public void onTopic(String chan, IRCUser u, String topic) {
-			logger.info(chan + "> " + u.getNick() + " changes topic into: "
-					+ topic);
+			System.out.println(chan + "> " + u.getNick() + " changes topic into: " + topic);
 		}
 
 		public void onPing(String p) {
@@ -154,44 +148,39 @@ public class IrcSource extends AbstractSource implements EventDrivenSource,
 		}
 
 		public void unknown(String a, String b, String c, String d) {
-			logger.info("UNKNOWN: " + a + " b " + c + " " + d);
+			System.out.println("UNKNOWN: " + a + " b " + c + " " + d);
 		}
 	}
 
-	private static void append(String chan, String user, String msg)
-			throws IOException {
+	private static void append(String chan, String user, String msg) throws IOException {
 		if (msg == null) {
 			logger.error("null append!");
 			return;
 		}
 		if (mChannel != null) {
 			String charset = "UTF-8";
-			String query = String.format("apikey=%s&text=%s&outputMode=%s",
-					URLEncoder.encode(API_KEY, charset),
-					URLEncoder.encode(msg, charset),
-					URLEncoder.encode("json", charset));
+			String query = String.format("apikey=%s&text=%s&outputMode=%s", URLEncoder.encode(API_KEY, charset),
+					URLEncoder.encode(msg, charset), URLEncoder.encode("json", charset));
 			StringBuilder jsonResults = new StringBuilder();
-			URLConnection urlconnection = new URL(API_URL + "?" + query)
-					.openConnection();
-			urlconnection.setRequestProperty("Accept-Charset", charset);
-			InputStreamReader in = new InputStreamReader(
-					urlconnection.getInputStream());
+			URLConnection connection = new URL(API_URL + "?" + query).openConnection();
+			connection.setRequestProperty("Accept-Charset", charset);
+			InputStreamReader in = new InputStreamReader(connection.getInputStream());
 			// Load the results into a StringBuilder
 			int read;
 			char[] buff = new char[1024];
 			while ((read = in.read(buff)) != -1) {
 				jsonResults.append(buff, 0, read);
 			}
-			String eventString = msg.replace(",", ";");
+			String timeStamp = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date());
+			String eventString = timeStamp + ",'" + msg + "'";
 			try {
 				// Create a JSON object hierarchy from the results
 				JSONObject jsonObj = new JSONObject(jsonResults.toString());
 				Integer sentiment = 0;
-				if (!jsonObj.has("docSentiment")) {
+				if (jsonObj.getJSONObject("docSentiment") == null) {
 					sentiment = 0;
 				} else {
-					switch (jsonObj.getJSONObject("docSentiment").getString(
-							"type")) {
+					switch (jsonObj.getJSONObject("docSentiment").getString("type")) {
 					case "neutral":
 						sentiment = 0;
 						break;
@@ -203,13 +192,12 @@ public class IrcSource extends AbstractSource implements EventDrivenSource,
 						break;
 					}
 				}
-				eventString = chan.replace("#", "") + "," + eventString + ","
-						+ sentiment.toString();
-				logger.info(eventString);
-				Event event = EventBuilder.withBody(eventString, mCharset);
+				eventString = eventString + "," + sentiment.toString() + "\n";
+				System.out.println(eventString);
+				Event event = EventBuilder.withBody(eventString.getBytes());
 				mChannel.processEvent(event);
 			} catch (JSONException e) {
-				logger.info("Cannot process JSON results:" + e.getMessage());
+				System.out.println("Cannot process JSON results:" + e.getMessage());
 			}
 		}
 	}
@@ -240,10 +228,8 @@ public class IrcSource extends AbstractSource implements EventDrivenSource,
 
 	private void createConnection() throws IOException {
 		if (connection == null) {
-			logger.debug("Creating new connection to hostname:{} port:{}",
-					hostname, port);
-			connection = new IRCConnection(hostname, new int[] { port },
-					password, nick, user, name);
+			logger.debug("Creating new connection to hostname:{} port:{}", hostname, port);
+			connection = new IRCConnection(hostname, new int[] { port }, password, nick, user, name);
 			connection.addIRCEventListener(new IRCConnectionListener());
 			connection.setEncoding("UTF-8");
 			connection.setPong(true);
@@ -265,13 +251,11 @@ public class IrcSource extends AbstractSource implements EventDrivenSource,
 
 	@Override
 	public void start() {
-		logger.info("IRC source starting");
+		System.out.println("IRC source starting");
 		mChannel = getChannelProcessor();
-		mCharset = Charset.forName("UTF-8");
 
 		try {
-			Enumeration<NetworkInterface> e = NetworkInterface
-					.getNetworkInterfaces();
+			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
 			while (e.hasMoreElements()) {
 				NetworkInterface n = (NetworkInterface) e.nextElement();
 				Enumeration<InetAddress> ee = n.getInetAddresses();
@@ -279,16 +263,16 @@ public class IrcSource extends AbstractSource implements EventDrivenSource,
 					InetAddress i = (InetAddress) ee.nextElement();
 					if (i.getHostAddress().toString().equals("10.60.64.45")) {
 						System.out.println("Setting proxy");
-						System.setProperty("socksProxyHost", "{10.60.17.102}");
-						System.setProperty("socksProxyPort", "{1080}");
-
+						System.setProperty("socksProxyHost", "10.60.17.102");
+						System.setProperty("socksProxyPort", "1080");
 					}
 				}
 			}
 			createConnection();
 		} catch (Exception e) {
-			logger.error("Unable to create irc client using hostname:"
-					+ hostname + " port:" + port + ". Exception follows.", e);
+			logger.error(
+					"Unable to create irc client using hostname:" + hostname + " port:" + port + ". Exception follows.",
+					e);
 			destroyConnection();
 			return;
 		}
@@ -300,13 +284,12 @@ public class IrcSource extends AbstractSource implements EventDrivenSource,
 
 	@Override
 	public void stop() {
-		logger.info("IRC source {} stopping", this.getName());
+		logger.debug("IRC source {} stopping", this.getName());
 
 		destroyConnection();
 
 		super.stop();
 
-		logger.debug("IRC source {} stopped. Metrics:{}", this.getName(),
-				counterGroup);
+		logger.debug("IRC source {} stopped. Metrics:{}", this.getName(), counterGroup);
 	}
 }
