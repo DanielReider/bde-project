@@ -1,4 +1,4 @@
-package de.fhmuenster.bde.mr;
+package de.fhmuenster.bde.twitchChatPull;
 
 import java.sql.SQLException;
 import java.sql.Connection;
