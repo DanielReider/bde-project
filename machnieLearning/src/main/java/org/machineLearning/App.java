@@ -1,4 +1,4 @@
-package org.randomForest;
+package org.machineLearning;
 
 /**
  * Hello world!
