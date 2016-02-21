@@ -8,9 +8,8 @@
 		<artifactId>bde</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>randomForest</artifactId>
+	<artifactId>machnieLearning</artifactId>
 	<version>0.0.1</version>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -30,7 +29,7 @@
 							</descriptorRefs>
 							<archive>
 								<manifest>
-									<mainClass>org.randomForest.Analysis</mainClass>
+									<mainClass>org.machineLearning.Analysis</mainClass>
 								</manifest>
 							</archive>
 						</configuration>
