@@ -157,8 +157,6 @@ public class StartFlumeAgent {
 			Runtime.getRuntime()
 					.exec("/usr/lib/flume-ng/bin/flume-ng agent -n a1 -c conf -f " + DESTPATH + chan + ".config &");
 			System.out.println("Agent started successfully");
-			System.out.println("Added Agent to List");
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
@@ -173,8 +171,7 @@ public class StartFlumeAgent {
 					.listStatus(new Path("hdfs://quickstart.cloudera:8020/data/twitch/chat/processing"));
 			Path[] paths = FileUtil.stat2Paths(status);
 			for (Path path : paths) {
-				System.out.println(path.toString());
-				if (path.toString().matches(".*" + chan + ".*tmp$"))
+				if (path.toString().matches(".*_" + chan + "\\..*tmp$"))
 					return true;
 			}
 
