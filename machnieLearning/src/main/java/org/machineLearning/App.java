@@ -1,4 +1,4 @@
-package org.twitchChatPull;
+package org.machineLearning;
 
 /**
  * Hello world!
