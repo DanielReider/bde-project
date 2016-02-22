@@ -69,6 +69,9 @@ Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234](ht
 Um Flume nutzen zu können, muss die .jar Datei in das lib-Verzeichnis von Flume kopiert werden. Dadurch wird es möglich die benötigte IrcSource zu nutzen.  
 
 ```
+$ git clone https://github.com/dr830029/bde-project.git
+$ cd bde-project/
+$ mvn clean package
 $ sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
 ```
 
