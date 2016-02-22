@@ -1,0 +1,62 @@
+<div class="row">
+  <div class="col-md-2">
+    <div class="form-group">
+      <label for="exampleInputPassword1">Channelname</label>
+      <input type="text" class="form-control" placeholder="Channelname" ng-model="channel" ng-disabled="loading">
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="form-group">
+      <label for="exampleInputPassword1">Spiel</label>
+      <input type="text" class="form-control" placeholder="Spiel" ng-model="game" ng-disabled="loading">
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="form-group">
+      <label for="exampleInputPassword1">Dauer [min]</label>
+      <input type="number" class="form-control" placeholder="Dauer" ng-model="duration" ng-disabled="loading">
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="form-group">
+      <label for="exampleInputPassword1">Tageszeit</label>
+      <select class="form-control" ng-model="daytime" ng-disabled="loading">
+        <option>Morgens</option>
+        <option>Mittags</option>
+        <option>Nachmittags</option>
+        <option>Abends</option>
+        <option>Nachts</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="form-group">
+      <label for="exampleInputPassword1">Anzahl Frames</label>
+      <input type="number" class="form-control" placeholder="Frames" ng-model="frames" ng-disabled="loading">
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="form-group">
+      <label for="exampleInputPassword1">Datum</label>
+      <input type="date" class="form-control" placeholder="Frames" ng-model="streamingdate" ng-disabled="loading">
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-2">
+    <div class="form-group">
+      <input type="button" class="btn btn-success" value="Predict!" ng-disabled="loading" ng-click="predict()">
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="spinner" ng-show="loading">
+      <div class="rect1"></div>
+      <div class="rect2"></div>
+      <div class="rect3"></div>
+      <div class="rect4"></div>
+      <div class="rect5"></div>
+    </div>
+  </div>
+</div>
+
+<h1>Vorraussichtliche Zuschauerzahl: {{predictionResult}}</h1>

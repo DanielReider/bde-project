@@ -1,0 +1,33 @@
+<div class="row">
+  <div class="col-md-2">
+    <div class="form-group">
+      <label for="exampleInputPassword1">Streamname</label>
+      <input type="text" class="form-control" id="stream" placeholder="Streamname" ng-model="stream" ng-model-options='{ debounce: 200 }' ng-change='loadData()' ng-disabled="loading">
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="form-group">
+      <label for="exampleInputPassword1">Tag</label>
+      <input type="date" class="form-control" id="date" placeholder="Streamname" ng-model="date" ng-change='loadData()' ng-disabled="loading">
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="spinner" ng-show="loading">
+      <div class="rect1"></div>
+      <div class="rect2"></div>
+      <div class="rect3"></div>
+      <div class="rect4"></div>
+      <div class="rect5"></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12" ng-show="!loading">
+    <center>
+      <h2>Chat Sentiment pro Minute</h2>
+      <nvd3 options="chatoptions" data="chatdata" api="chatperminapi"></nvd3>
+      <h2>Durchschnittliche Zuschauer pro Minute</h2>
+      <nvd3 options="viewersoptions" data="viewersdata" api="viewersperminapi" ></nvd3>
+    </center>
+  </div>
+</div>
