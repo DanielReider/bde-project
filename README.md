@@ -59,7 +59,7 @@ Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234](ht
 * Travis-CI wurde als CI-Server verwendet. Sobald ein Build in den Master-Branch des Projektes gepushed wird, wird automatisch ein neues Bild auf dem CI-Server generiert und getestet. 
 
 ##Automation
-* Alle Processes sprich Pig Skripte, Map-Reduce-Jobs und Spark-Jobs werden mit Hilfe von Oozie-Workflows und Oozie-Coordinators gemanaged und Ausgeführt.
+* Alle Processes sprich Pig Skripte, Flume-Agents, Map-Reduce-Jobs, und Spark-Jobs werden mit Hilfe von Oozie-Workflows und Oozie-Coordinators gemanaged und Ausgeführt.
 * Die über das Web-Interface getriggerten Aktionen werden in real-time ausgeführt.
 
 #Getting started
