@@ -1,0 +1,28 @@
+[
+{
+  "pk": 56, 
+  "model": "desktop.document2", 
+  "fields": {
+    "uuid": "5718a4a6-727c-0c2a-f8c2-db82b0b08d9a", 
+    "extra": "", 
+    "type": "oozie-coordinator2", 
+    "description": "Pulls Data every 10 min", 
+    "tags": [], 
+    "is_history": false, 
+    "last_modified": "2016-02-23T11:58:34", 
+    "version": 1, 
+    "owner": [
+      "cloudera"
+    ], 
+    "dependencies": [
+      [
+        "502118c3-2307-69d6-f39b-2eefd2e4cee6", 
+        1, 
+        false
+      ]
+    ], 
+    "data": "{\"properties\": {\"job_xml\": \"\", \"execution\": \"FIFO\", \"end\": \"${end_date}\", \"description\": \"Pulls Data every 10 min\", \"frequency_number\": 1, \"workflow\": \"502118c3-2307-69d6-f39b-2eefd2e4cee6\", \"deployment_dir\": \"/user/hue/oozie/workspaces/hue-oozie-1456257488.33\", \"cron_frequency\": \"*/10 * * * *\", \"frequency_unit\": \"days\", \"schema_version\": \"uri:oozie:coordinator:0.2\", \"cron_advanced\": true, \"start\": \"${start_date}\", \"timeout\": null, \"timezone\": \"America/Los_Angeles\", \"credentials\": [], \"parameters\": [{\"name\": \"oozie.use.system.libpath\", \"value\": true}, {\"name\": \"start_date\", \"value\": \"2016-02-23T11:58Z\"}, {\"name\": \"end_date\", \"value\": \"2016-03-01T11:58Z\"}], \"sla\": [{\"key\": \"enabled\", \"value\": false}, {\"key\": \"nominal-time\", \"value\": \"${nominal_time}\"}, {\"key\": \"should-start\", \"value\": \"\"}, {\"key\": \"should-end\", \"value\": \"${30 * MINUTES}\"}, {\"key\": \"max-duration\", \"value\": \"\"}, {\"key\": \"alert-events\", \"value\": \"\"}, {\"key\": \"alert-contact\", \"value\": \"\"}, {\"key\": \"notification-msg\", \"value\": \"\"}, {\"key\": \"upstream-apps\", \"value\": \"\"}]}, \"name\": \"TwitchPull Job\", \"end_date\": {\"name\": \"end_date\", \"value\": \"2016-03-01T11:58Z\"}, \"variables\": [], \"start_date\": {\"name\": \"start_date\", \"value\": \"2016-02-23T11:58Z\"}, \"showAdvancedFrequencyUI\": true, \"variablesUI\": [\"parameter\", \"input_path\", \"output_path\"], \"workflowParameters\": [], \"isDirty\": true, \"id\": null, \"uuid\": \"5718a4a6-727c-0c2a-f8c2-db82b0b08d9a\"}", 
+    "name": "TwitchPull Job"
+  }
+}
+]
