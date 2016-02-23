@@ -88,6 +88,5 @@
 		<module>weatherPull</module>
 		<module>twitchChatPull</module>
 		<module>machnieLearning</module>
-		<module></module>  <module>TwitchAnalytics</module>
   </modules>
 </project>
