@@ -1,9 +1,11 @@
 package de.fhmuenster.bde.twitchChatPull;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,6 +23,7 @@ public class StartFlumeAgent {
 
 	private static String DESTPATH = "/home/cloudera/chat/config/";
 	private static String SOURCEFILE = "/home/cloudera/bde-project/twitchChatPull/config/flume.properties";
+	private static String output = "";
 
 	public static Properties createProperties() {
 		Properties prop = new Properties();
@@ -36,7 +39,7 @@ public class StartFlumeAgent {
 		prop.put("a1.sources.IRC.password", "oauth:pjcft7qxw68ir00zfisr8xnwlpixtc");
 
 		prop.put("a1.sinks.HDFS.type", "hdfs");
-		prop.put("a1.sinks.HDFS.hdfs.path", "/data/twitch/chat/input/");
+		prop.put("a1.sinks.HDFS.hdfs.path", "/data/twitch/chat/processing/");
 		prop.put("a1.sinks.HDFS.hdfs.filePrefix", "");
 		prop.put("a1.sinks.HDFS.hdfs.useLocalTimeStamp", "hdfs");
 		prop.put("a1.sinks.HDFS.hdfs.rollInterval", "600");
@@ -154,15 +157,9 @@ public class StartFlumeAgent {
 		}
 
 		try {
-			/*
-			 * Runtime.getRuntime() .exec(
-			 * "/usr/lib/flume-ng/bin/flume-ng agent -n a1 -c conf -f " +
-			 * DESTPATH + chan + ".config &");
-			 */
-			String[] args = new String[] { "gnome-terminal", "-x", "/usr/lib/flume-ng/bin/flume-ng", "agent", "-n",
-					"a1", "-c", "conf", "-f", DESTPATH + chan + ".config", "&" };
-			Process p = new ProcessBuilder(args).start();
-			System.out.println("Agent started successfully");
+			output = output + "0,10,20,30,40,50 * * * * /usr/lib/flume-ng/bin/flume-ng agent -n a1 -c conf -f "
+					+ DESTPATH + chan + ".config\n";
+			System.out.println("Agent added to Job list");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
@@ -176,6 +173,7 @@ public class StartFlumeAgent {
 			FileStatus[] status = fs.listStatus(new Path("hdfs://quickstart.cloudera:8020/data/twitch/chat/input"));
 			Path[] paths = FileUtil.stat2Paths(status);
 			for (Path path : paths) {
+				System.out.println(path.toString());
 				if (path.toString().matches(".*_" + chan + "\\..*tmp$"))
 					return true;
 			}
@@ -186,13 +184,34 @@ public class StartFlumeAgent {
 		return false;
 	}
 
+	public static void writeToJobFile() {
+		try {
+			File file = new File("/var/spool/cron/cloudera");
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileWriter fw;
+			fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(output);
+			bw.close();
+			System.out.println("Add Cron-Jobs");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String[] args) {
 		if (args.length > 0) {
-			if (agentExists(args[0])) {
-				System.out.println(args[0] + ": Agent already started");
-			} else {
-				runAgent(args[0]);
+			for (String arg : args) {
+				if (agentExists(arg)) {
+					System.out.println(arg + ": Agent already started");
+				} else {
+					runAgent(arg);
+				}
 			}
+			writeToJobFile();
 		} else {
 			try {
 				FileSystem fs = FileSystem.get(new Configuration());
@@ -230,7 +249,10 @@ public class StartFlumeAgent {
 
 			} catch (IOException e) { // TODO Auto-generated catch block
 				e.printStackTrace();
+			} finally {
+				writeToJobFile();
 			}
 		}
+
 	}
 }
