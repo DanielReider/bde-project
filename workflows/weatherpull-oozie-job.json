@@ -1,0 +1,28 @@
+[
+{
+  "pk": 2, 
+  "model": "desktop.document2", 
+  "fields": {
+    "uuid": "c84c97b6-167c-db04-1787-6b1176959511", 
+    "extra": "", 
+    "type": "oozie-coordinator2", 
+    "description": "Pulls the weather data from OpenWeatherMap every hour", 
+    "tags": [], 
+    "is_history": false, 
+    "last_modified": "2016-02-23T01:07:15", 
+    "version": 1, 
+    "owner": [
+      "cloudera"
+    ], 
+    "dependencies": [
+      [
+        "98695387-97f0-174d-4079-7c6bd5bbcc30", 
+        1, 
+        false
+      ]
+    ], 
+    "data": "{\"end_date\": {\"name\": \"end_date\", \"value\": \"2016-03-01T01:06Z\"}, \"variables\": [], \"isDirty\": true, \"showAdvancedFrequencyUI\": true, \"variablesUI\": [\"parameter\", \"input_path\", \"output_path\"], \"workflowParameters\": [], \"properties\": {\"job_xml\": \"\", \"execution\": \"FIFO\", \"end\": \"${end_date}\", \"description\": \"Pulls the weather data from OpenWeatherMap every hour\", \"frequency_number\": 1, \"workflow\": \"98695387-97f0-174d-4079-7c6bd5bbcc30\", \"deployment_dir\": \"/user/hue/oozie/workspaces/hue-oozie-1456218382.67\", \"cron_frequency\": \"5 * * * *\", \"frequency_unit\": \"days\", \"schema_version\": \"uri:oozie:coordinator:0.2\", \"cron_advanced\": false, \"start\": \"${start_date}\", \"timeout\": null, \"timezone\": \"America/Los_Angeles\", \"credentials\": [], \"parameters\": [{\"name\": \"oozie.use.system.libpath\", \"value\": true}, {\"name\": \"start_date\", \"value\": \"2016-02-23T01:06Z\"}, {\"name\": \"end_date\", \"value\": \"2016-03-01T01:06Z\"}], \"sla\": [{\"key\": \"enabled\", \"value\": false}, {\"key\": \"nominal-time\", \"value\": \"${nominal_time}\"}, {\"key\": \"should-start\", \"value\": \"\"}, {\"key\": \"should-end\", \"value\": \"${30 * MINUTES}\"}, {\"key\": \"max-duration\", \"value\": \"\"}, {\"key\": \"alert-events\", \"value\": \"\"}, {\"key\": \"alert-contact\", \"value\": \"\"}, {\"key\": \"notification-msg\", \"value\": \"\"}, {\"key\": \"upstream-apps\", \"value\": \"\"}]}, \"uuid\": \"c84c97b6-167c-db04-1787-6b1176959511\", \"name\": \"Pull Weatherdata\", \"id\": 2, \"start_date\": {\"name\": \"start_date\", \"value\": \"2016-02-23T01:06Z\"}}", 
+    "name": "Pull Weatherdata"
+  }
+}
+]

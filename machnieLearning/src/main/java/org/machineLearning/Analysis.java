@@ -27,7 +27,7 @@ public class Analysis {
 		JavaSparkContext jsc = new JavaSparkContext(sparkConf);
 		SQLContext sqlContext = new org.apache.spark.sql.SQLContext(jsc);
 		// Load and parse the data file.
-		String datapath = "hdfs://quickstart.cloudera:8020/data/analysis/input/merged";
+		String datapath = "hdfs://quickstart.cloudera:8020/data/analysis/input/completed/";
 		JavaRDD<String> traindata = jsc.textFile(datapath);
 
 		JavaRDD<LabeledDocument> traindataframerdd = traindata.map(new Function<String, LabeledDocument>() {

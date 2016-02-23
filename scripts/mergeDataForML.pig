@@ -1,3 +1,5 @@
+REGISTER ./hbase-server-1.0.0-cdh5.5.0.jar
+
 %declare DATETIME `date +%Y-%m-%dT%H-%M-%S`
 
 ml_data = LOAD '/data/analysis/input/collecting/' using PigStorage('\t')
@@ -33,3 +35,6 @@ ml = FOREACH joined_data GENERATE CONCAT('1,', ml_prep::name,' ', ml_prep::game,
 ml_filterdexport = FILTER ml BY value is not null;
 
 STORE ml INTO '/data/analysis/input/merged/$DATETIME';
+
+fs -mv '/data/analysis/input/merged/$DATETIME/part-r*' '/data/analysis/input/completed/';
+fs -rm '/data/analysis/input/merged/$DATETIME';
