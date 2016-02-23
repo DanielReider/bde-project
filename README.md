@@ -202,9 +202,10 @@ $ cd bde-project/
 $ sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
 ```
 
-Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. 
+Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. Zuvor sollte allerdings die startAgent.sh Datei ausführbar gemacht werden.
 
 ```
+$ sudo chmod +x /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
 $ sudo crontab -e
 5,15,25,35,45,55 * * * * /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
 ```
