@@ -34,7 +34,6 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		String place = value.toString();
 		while (success == false && trys < 3) {
-			System.out.println("test");
 			try {
 				Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
 
@@ -48,15 +47,12 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 							System.setProperty("http.proxyPort", "8080");
 							System.setProperty("https.proxyHost", "10.60.17.102");
 							System.setProperty("https.proxyPort", "8080");
-							System.out.println("setting proxy");
 						}
 					}
 				}
-				System.out.println(place);
 				String concatURL = "http://api.openweathermap.org/data/2.5/weather?q=" + place
 						+ ",DE&appid=58c42f4cf0f253c2f5ae3f28adc0505c";
 				URL url = new URL(concatURL);
-				System.out.println(concatURL);
 				HttpURLConnection con = (HttpURLConnection) url.openConnection();
 				// optional default is GET
 				con.setRequestMethod("GET");
@@ -87,7 +83,6 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 				double tempInCelsius = KelvinToCelsius(tempInKelvin);
 				this.place.set(place);
 				weatherInfo = weather + "," + windSpeed + "," + tempInCelsius;
-				System.out.println(weatherInfo);
 				Calendar now = Calendar.getInstance();
 				String generalData = new SimpleDateFormat("yyyyMMddHH").format(now.getTime());
 				
@@ -126,7 +121,6 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 	      
 	      // Saving the put Instance to the HTable.
 	      hTable.put(p);
-	      System.out.println("data inserted");
 	      
 	      // closing HTable
 	      hTable.close();
