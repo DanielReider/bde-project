@@ -202,15 +202,16 @@ Die importierten Oozie Coordinators müssen manuell über das HUE gestartet werd
 Um Flume nutzen zu können, muss die .jar Datei in das lib-Verzeichnis von Flume kopiert werden. Dadurch wird es möglich die benötigte IrcSource zu nutzen. Hierzu muss zunächst in das bde-project navigiert werden und anschließend die .jar Datei in das lib/ Verzeichnis von flume-ng kopiert werden.
 
 ```
-$ cd bde-project/
-$ sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
+cd bde-project/
+sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
 ```
 
 Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. Zuvor sollte allerdings die startAgent.sh Datei ausführbar gemacht werden.
 
 ```
-$ sudo chmod +x /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
-$ sudo crontab -e
+sudo chmod 777 /var/spool/cron/cloudera
+sudo chmod +x /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
+sudo crontab -e
 5,15,25,35,45,55 * * * * /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
 ```
 
