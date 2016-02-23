@@ -27,7 +27,7 @@
                             </descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>org.twitchChatPull.IrcSource</mainClass>
+                                    <mainClass>de.fhmuenster.bde.twitchChatPull.StartFlumeAgent</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
