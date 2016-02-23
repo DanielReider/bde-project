@@ -92,6 +92,7 @@ hadoop fs -mkdir /scripts
 hadoop fs -mkdir /lib
 hadoop fs -put scripts/* /scripts/
 hadoop fs -put /usr/jars/hbase-server-1.0.0-cdh5.5.0.jar /lib/
+hadoop fs -put /usr/lib/zookeeper/zookeeper.jar /lib/
 ```
 
 ## Setup Apache
