@@ -202,14 +202,15 @@ $ cd bde-project/
 $ sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
 ```
 
-Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. 
+Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. Zuvor sollte allerdings die startAgent.sh Datei ausführbar gemacht werden.
 
 ```
+$ sudo chmod +x /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
 $ sudo crontab -e
 5,15,25,35,45,55 * * * * /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
 ```
 
-Dieser Job dient als Basis-Job. In der startAgent.sh Datei wird die twitchChatPull-0.0.1-jar-with-dependencies.jar aufgerufen. Diese legt für jeden benötigten und noch nicht gestarteten Flume Agent einen Cron-Job unter dem User cloudera an. 
+Dieser Job dient als Basis-Job. In der startAgent.sh Datei wird die twitchChatPull-0.0.1-jar-with-dependencies.jar aufgerufen. Diese legt für jeden benötigten und noch nicht gestarteten Flume Agent einen Cron-Job unter dem User cloudera an. Zur Beschränkung der Chats, die ausgelesen werden sollen, können Chats als Argumente übergeben werden. Standardmäßig ist der Abruf auf die Chats nightblue3 und rocketbeanstv beschränkt. Wird die Übergabe der Chats entfernt, werden sämtliche verfügbaren Chats ausgelesen.
 
 ### Einrichten des TwitchMetaPull-Jobs
 ```
