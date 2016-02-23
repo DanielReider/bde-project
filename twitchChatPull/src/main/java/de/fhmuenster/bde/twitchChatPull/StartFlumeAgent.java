@@ -1,59 +1,21 @@
 package de.fhmuenster.bde.twitchChatPull;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-
-class StreamGobbler extends Thread {
-	InputStream is;
-
-	// reads everything from is until empty.
-	StreamGobbler(InputStream is) {
-		this.is = is;
-	}
-
-	public void run() {
-		Integer counter = 0;
-		try {
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String line = null;
-			while (br.ready()) {
-				line = br.readLine();
-				System.out.println(line);
-				while (!br.ready() && counter < 60) {
-					try {
-						sleep(1000);
-						counter = counter + 1;
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				if (counter >= 100) {
-					break;
-				} else {
-					counter = 0;
-				}
-			}
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-	}
-}
 
 public class StartFlumeAgent {
 
@@ -74,7 +36,7 @@ public class StartFlumeAgent {
 		prop.put("a1.sources.IRC.password", "oauth:pjcft7qxw68ir00zfisr8xnwlpixtc");
 
 		prop.put("a1.sinks.HDFS.type", "hdfs");
-		prop.put("a1.sinks.HDFS.hdfs.path", "/data/twitch/chat/input/");
+		prop.put("a1.sinks.HDFS.hdfs.path", "/data/twitch/chat/processing/");
 		prop.put("a1.sinks.HDFS.hdfs.filePrefix", "");
 		prop.put("a1.sinks.HDFS.hdfs.useLocalTimeStamp", "hdfs");
 		prop.put("a1.sinks.HDFS.hdfs.rollInterval", "600");
@@ -191,43 +153,37 @@ public class StartFlumeAgent {
 			System.out.println("Config file already exists");
 		}
 
-		HiveClient hc = new HiveClient();
-		if (!hc.channelExists(chan)) {
-			try {
-				Process p;
-				p = Runtime.getRuntime()
-						.exec("/usr/lib/flume-ng/bin/flume-ng agent -n a1 -c conf -f " + DESTPATH + chan + ".config");
-				System.out.println("Agent started successfully");
-				hc.writeChannel(chan);
-				System.out.println("Added Agent to List");
+		try {
+			Runtime.getRuntime()
+					.exec("/usr/lib/flume-ng/bin/flume-ng agent -n a1 -c conf -f " + DESTPATH + chan + ".config &");
+			System.out.println("Agent started successfully");
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
 
-				// output both stdout and stderr data from proc to stdout of
-				// this process
-				StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream());
-				StreamGobbler outputGobbler = new StreamGobbler(p.getInputStream());
-				errorGobbler.start();
-				outputGobbler.start();
-				p.waitFor();
+	}
 
-				System.out.println("Close buffer");
-				hc.removeChannel(chan);
-				System.out.println("Removed Agent from List");
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.println(e.getMessage());
-				hc.removeChannel(chan);
+	public static Boolean agentExists(String chan) {
+		try {
+			FileSystem fs = FileSystem.get(new Configuration());
+			FileStatus[] status = fs
+					.listStatus(new Path("hdfs://quickstart.cloudera:8020/data/twitch/chat/processing"));
+			Path[] paths = FileUtil.stat2Paths(status);
+			for (Path path : paths) {
+				if (path.toString().matches(".*_" + chan + "\\..*tmp$"))
+					return true;
 			}
 
-		} else {
-			System.out.println("Agent already started");
+		} catch (Exception e) {
+			System.out.println("File not found");
 		}
+		return false;
 	}
 
 	public static void main(String[] args) {
-		Configuration conf = new Configuration();
-		FileSystem fs;
 		try {
-			fs = FileSystem.get(conf);
+			FileSystem fs = FileSystem.get(new Configuration());
 			Calendar cal = Calendar.getInstance();
 			Path inFile;
 			int minute = cal.get(Calendar.MINUTE);
@@ -246,20 +202,23 @@ public class StartFlumeAgent {
 					while ((line = in.readLine()) != null) {
 						String[] dataArray = line.split("\t");
 						if (dataArray.length >= 4) {
-							System.out.println(dataArray[3]);
-							// runAgent(dataArray[3]);
+							if (agentExists(dataArray[3])) {
+								System.out.println(args[0] + ": Agent already started");
+							} else {
+								runAgent(dataArray[3]);
+							}
+
 						}
 
 					}
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
+				} catch (IOException e) { // TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) { // TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	}
 }

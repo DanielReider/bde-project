@@ -59,16 +59,107 @@ Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234](ht
 * Travis-CI wurde als CI-Server verwendet. Sobald ein Build in den Master-Branch des Projektes gepushed wird, wird automatisch ein neues Bild auf dem CI-Server generiert und getestet. 
 
 ##Automation
-* Alle Processes sprich Pig Skripte, Map-Reduce-Jobs und Spark-Jobs werden mit Hilfe von Oozie-Workflows und Oozie-Coordinators gemanaged und Ausgeführt.
+* Alle Processes sprich Pig Skripte, Flume-Agents, Map-Reduce-Jobs, und Spark-Jobs werden mit Hilfe von Oozie-Workflows und Oozie-Coordinators gemanaged und Ausgeführt.
 * Die über das Web-Interface getriggerten Aktionen werden in real-time ausgeführt.
 
 #Getting started
 
-### Flume Einrichtung
+## Setup Apache
+Aufrufen der Config:
+```
+sudo nano /etc/httpd/conf/httpd.conf
+```
+anpassen des Ports:
+```
+Listen 80
+```
+ändern in:
+```
+Listen 1234
+```
+einfügen in die Config:
+```
+ProxyPass /TwitchAnalyticsBackend http://localhost:1235/TwitchAnalyticsWeb
+ProxyPassReverse /TwitchAnalyticsBackend http://localhost:1235/TwitchAnalyticsWeb
+```
+Dann den Service starten:
+```
+sudo service httpd start
+```
+im nächsten Schritt muss das Frontend kopiert werden:
+```
+sudo cp -r TwitchAnalyticsFrontend/ /var/www/html/
+```
 
-Um Flume nutzen zu können, muss die .jar Datei in das lib-Verzeichnis von Flume kopiert werden. Dadurch wird es möglich die benötigte IrcSource zu nutzen.  
+## Setup Wildfly
+für Wildfly wechseln wie in das Homeverzeichnis zurück und laden Wildfly:
+```
+cd ..
+wget "http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.zip"
+unzip wildfly-8.2.0.Final.zip
+mv wildfly-8.2.0.Final WildFly
+sudo nano WildFly/standalone/configuration/standalone-full.xml
+```
+in der Config ändern wir den HTTP.Port:
+```
+<socket-binding name="http" port="${jboss.http.port:8080}"/>
+```
+in
+```
+<socket-binding name="http" port="${jboss.http.port:1235}"/>
+```
+im Anschluss speichern und Wildfly als Service einrichten:
 
 ```
+sudo cp WildFly/bin/init.d/wildfly.conf /etc/default/
+sudo nano /etc/default/wildfly.conf
+```
+Dort folgende Configs einstellen und speichern:
+```
+JBOSS_HOME="/home/cloudera/WildFly"
+JBOSS_USER=wildfly
+JBOSS_CONFIG=standalone-full.xml
+JBOSS_CONSOLE_LOG="/var/log/wildfly/console.log"
+```
+
+Service Startskript hinzufügen, Ordner für Logs hinzufügen und Berechtigungen setzten:
+```
+sudo cp WildFly/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly
+sudo mkdir -p /var/log/wildfly
+sudo adduser wildfly
+sudo chown -R wildfly:wildfly /home/cloudera/WildFly/
+sudo chown -R wildfly:wildfly /var/log/wildfly/
+sudo chkconfig --add wildfly
+sudo service wildfly start
+```
+Server ist gestartet. Der Service kann deployed werden:
+```
+sudo cp bde-project/TwitchAnalyticsWeb.war WildFly/standalone/deployments/
+```
+Der Wildfly ist nun eingerichtet. (Machine Learning Model wurde noch nicht generiert und keine Daten im HBase, daher noch nicht funktionsfähig)
+
+## Setup Pipeline
+
+Zunächst einmal muss das Github Projekt geklont und kompiliert werden.
+
+```
+$ git clone https://github.com/dr830029/bde-project.git
+$ cd bde-project/
+$ mvn clean package
+```
+
+
+Im Anschluss müssen die JAR-Files in das Hadoop-Cluster hochgeladen werden, Bsp. für weatherPull:
+```
+hadoop fs -put /weatherPull/target/weatherPull-0.0.1-jar-with-dependencies.jar /lib
+```
+
+### Flume Einrichtung
+
+Um Flume nutzen zu können, muss die .jar Datei in das lib-Verzeichnis von Flume kopiert werden. Dadurch wird es möglich die benötigte IrcSource zu nutzen. Hierzu muss zunächst in das bde-project navigiert werden und anschließend die .jar Datei in das lib/ Verzeichnis von flume-ng kopiert werden.
+
+```
+$ cd bde-project/
 $ sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
 ```
 

@@ -240,19 +240,6 @@ public class IrcSource extends AbstractSource implements EventDrivenSource, Conf
 		mCharset = Charset.forName("UTF-8");
 
 		try {
-			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-			while (e.hasMoreElements()) {
-				NetworkInterface n = (NetworkInterface) e.nextElement();
-				Enumeration<InetAddress> ee = n.getInetAddresses();
-				while (ee.hasMoreElements()) {
-					InetAddress i = (InetAddress) ee.nextElement();
-					if (i.getHostAddress().toString().equals("10.60.64.45")) {
-						System.out.println("Setting proxy");
-						System.setProperty("socksProxyHost", "10.60.17.102");
-						System.setProperty("socksProxyPort", "1080");
-					}
-				}
-			}
 			createConnection();
 		} catch (Exception e) {
 			logger.error(
