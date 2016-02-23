@@ -11,6 +11,9 @@ REGISTER ./zookeeper.jar
 
 set hbase.zookeeper.quorum 'localhost';
 
+--remove temp emptyfile
+fs -rm -f /data/twitch/chat/processing/chatdata-empty;
+
 twitchdata = LOAD '/data/twitch/streammetadata/processing/' using PigStorage(';')
 	AS (channel_id:long, viewers:long, game:chararray, name:chararray,
     status: chararray, created:chararray, mature:boolean,
