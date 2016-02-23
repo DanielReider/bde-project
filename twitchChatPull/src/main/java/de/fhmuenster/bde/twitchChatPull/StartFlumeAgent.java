@@ -36,7 +36,7 @@ public class StartFlumeAgent {
 		prop.put("a1.sources.IRC.password", "oauth:pjcft7qxw68ir00zfisr8xnwlpixtc");
 
 		prop.put("a1.sinks.HDFS.type", "hdfs");
-		prop.put("a1.sinks.HDFS.hdfs.path", "/data/twitch/chat/processing/");
+		prop.put("a1.sinks.HDFS.hdfs.path", "/data/twitch/chat/input/");
 		prop.put("a1.sinks.HDFS.hdfs.filePrefix", "");
 		prop.put("a1.sinks.HDFS.hdfs.useLocalTimeStamp", "hdfs");
 		prop.put("a1.sinks.HDFS.hdfs.rollInterval", "600");
@@ -154,8 +154,14 @@ public class StartFlumeAgent {
 		}
 
 		try {
-			Runtime.getRuntime()
-					.exec("/usr/lib/flume-ng/bin/flume-ng agent -n a1 -c conf -f " + DESTPATH + chan + ".config &");
+			/*
+			 * Runtime.getRuntime() .exec(
+			 * "/usr/lib/flume-ng/bin/flume-ng agent -n a1 -c conf -f " +
+			 * DESTPATH + chan + ".config &");
+			 */
+			String[] args = new String[] { "gnome-terminal", "-x", "/usr/lib/flume-ng/bin/flume-ng", "agent", "-n",
+					"a1", "-c", "conf", "-f", DESTPATH + chan + ".config", "&" };
+			Process p = new ProcessBuilder(args).start();
 			System.out.println("Agent started successfully");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -167,8 +173,7 @@ public class StartFlumeAgent {
 	public static Boolean agentExists(String chan) {
 		try {
 			FileSystem fs = FileSystem.get(new Configuration());
-			FileStatus[] status = fs
-					.listStatus(new Path("hdfs://quickstart.cloudera:8020/data/twitch/chat/processing"));
+			FileStatus[] status = fs.listStatus(new Path("hdfs://quickstart.cloudera:8020/data/twitch/chat/input"));
 			Path[] paths = FileUtil.stat2Paths(status);
 			for (Path path : paths) {
 				if (path.toString().matches(".*_" + chan + "\\..*tmp$"))
@@ -182,43 +187,50 @@ public class StartFlumeAgent {
 	}
 
 	public static void main(String[] args) {
-		try {
-			FileSystem fs = FileSystem.get(new Configuration());
-			Calendar cal = Calendar.getInstance();
-			Path inFile;
-			int minute = cal.get(Calendar.MINUTE);
-			do {
-				inFile = new Path("hdfs://quickstart.cloudera:8020/data/twitch/streammetadata/processing/"
-						+ cal.get(Calendar.YEAR) + "/" + (cal.get(Calendar.MONTH) + 1) + "/"
-						+ cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.HOUR_OF_DAY) + "/" + minute + "/"
-						+ "part-00000");
-				minute = minute - 1;
-				System.out.println(inFile.toString());
-			} while ((!fs.exists(inFile) && minute >= 0));
-			if (fs.exists(inFile)) {
-				try {
-					FSDataInputStream in = fs.open(inFile);
-					String line;
-					while ((line = in.readLine()) != null) {
-						String[] dataArray = line.split("\t");
-						if (dataArray.length >= 4) {
-							if (agentExists(dataArray[3])) {
-								System.out.println(args[0] + ": Agent already started");
-							} else {
-								runAgent(dataArray[3]);
+		if (args.length > 0) {
+			if (agentExists(args[0])) {
+				System.out.println(args[0] + ": Agent already started");
+			} else {
+				runAgent(args[0]);
+			}
+		} else {
+			try {
+				FileSystem fs = FileSystem.get(new Configuration());
+				Calendar cal = Calendar.getInstance();
+				Path inFile;
+				int minute = cal.get(Calendar.MINUTE);
+				do {
+					inFile = new Path("hdfs://quickstart.cloudera:8020/data/twitch/streammetadata/processing/"
+							+ cal.get(Calendar.YEAR) + "/" + (cal.get(Calendar.MONTH) + 1) + "/"
+							+ cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.HOUR_OF_DAY) + "/" + minute + "/"
+							+ "part-00000");
+					minute = minute - 1;
+					System.out.println(inFile.toString());
+				} while ((!fs.exists(inFile) && minute >= 0));
+				if (fs.exists(inFile)) {
+					try {
+						FSDataInputStream in = fs.open(inFile);
+						String line;
+						while ((line = in.readLine()) != null) {
+							String[] dataArray = line.split("\t");
+							if (dataArray.length >= 4) {
+								if (agentExists(dataArray[3])) {
+									System.out.println(args[0] + ": Agent already started");
+								} else {
+									runAgent(dataArray[3]);
+								}
+
 							}
 
 						}
-
+					} catch (IOException e) { // TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				} catch (IOException e) { // TODO Auto-generated catch block
-					e.printStackTrace();
 				}
+
+			} catch (IOException e) { // TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-
-		} catch (IOException e) { // TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-
 	}
 }
