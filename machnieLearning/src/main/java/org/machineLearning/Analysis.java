@@ -27,7 +27,7 @@ public class Analysis {
 		JavaSparkContext jsc = new JavaSparkContext(sparkConf);
 		SQLContext sqlContext = new org.apache.spark.sql.SQLContext(jsc);
 		// Load and parse the data file.
-		String datapath = "hdfs://quickstart.cloudera:8020/data/analysis/input/";
+		String datapath = "hdfs://quickstart.cloudera:8020/data/analysis/input/merged";
 		JavaRDD<String> traindata = jsc.textFile(datapath);
 
 		JavaRDD<LabeledDocument> traindataframerdd = traindata.map(new Function<String, LabeledDocument>() {
@@ -43,8 +43,12 @@ public class Analysis {
 
 			private LabeledDocument splitStringtoDoubles(String s) {
 				String[] splitVals = s.split(",");
-				System.out.println(splitVals[0] + "::"+ splitVals[1]);
-				return new LabeledDocument(Long.parseLong(splitVals[0]),splitVals[1], Double.parseDouble(splitVals[2]));
+				if (splitVals.length <= 2){
+					return new LabeledDocument(0L,"" ,0);
+				} else {
+					System.out.println(splitVals[0] + "::"+ splitVals[1]);
+					return new LabeledDocument(Long.parseLong(splitVals[0]),splitVals[1], Double.parseDouble(splitVals[2]));
+				}
 			}
 		});
 
