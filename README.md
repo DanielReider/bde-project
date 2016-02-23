@@ -223,7 +223,8 @@ hadoop fs -put twitchpull/target/twitchpull-0.0.1-jar-with-dependencies.jar /lib
 ```
 
 #### Import der Oozie Workflows & Coordinators über HUE
-* Import des twitchMetaPull-workflow.json aus dem bde-project/workflows/
+* Import des aggregateTwitchData-workflow.json aus dem bde-project/workflows/
+* Import des pullTwitchData-workflow.json aus dem bde-project/workflows/
 * Import des twitchMetaPull-oozie-job.json aus dem bde-project/workflows/
 
 Die importierten Oozie Coordinatorss müssen manuell über das HUE gestartet werden.
