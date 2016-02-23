@@ -9,6 +9,7 @@ REGISTER ./zookeeper.jar
 %declare LONG_CONVERTER 'com.twitter.elephantbird.pig.util.LongWritableConverter';
 %declare DATETIME `date +%Y-%m-%dT%H-%M-%S`
 
+set hbase.zookeeper.quorum 'localhost';
 
 twitchdata = LOAD '/data/twitch/streammetadata/processing/' using PigStorage(';')
 	AS (channel_id:long, viewers:long, game:chararray, name:chararray,
