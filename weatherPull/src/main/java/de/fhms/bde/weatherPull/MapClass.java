@@ -99,6 +99,8 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 			} catch (Exception e) {
 
 			}
+			success = false;
+			weatherInfo = "";
 		}
 	}
 
