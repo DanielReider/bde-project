@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Enumeration;
 
@@ -26,7 +27,6 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 	private Text place = new Text();
 	private Text writtenData = new Text();
 	private String weatherInfo;
-	private String generalData;
 	private Boolean success = false;
 	private int trys = 0;
 	private StringBuffer response = null;
@@ -68,6 +68,7 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 				in.close();
 				success = true;
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.out.println("catch! next try:" + trys);
 				trys++;
 			}
@@ -78,17 +79,13 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 				String weather = obj.getJSONArray("weather").getJSONObject(0).get("main").toString();
 				double tempInKelvin = obj.getJSONObject("main").getDouble("temp");
 				String windSpeed = obj.getJSONObject("wind").get("speed").toString();
-
+				
 				double tempInCelsius = KelvinToCelsius(tempInKelvin);
 				this.place.set(place);
 				weatherInfo = weather + "," + windSpeed + "," + tempInCelsius;
-
 				Calendar now = Calendar.getInstance();
-
-				generalData = "" + Calendar.getInstance().get(Calendar.YEAR)
-						+ (Calendar.getInstance().get(Calendar.MONTH) + 1) + now.get(Calendar.DAY_OF_MONTH)
-						+ now.get(Calendar.HOUR_OF_DAY);
-
+				String generalData = new SimpleDateFormat("yyyyMMddHH").format(now.getTime());
+				
 				writtenData.set(generalData + "," + weatherInfo);
 				
 				dataToHBase(generalData, this.place.toString(),weatherInfo);
@@ -97,6 +94,8 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 			} catch (Exception e) {
 
 			}
+			success = false;
+			weatherInfo = "";
 		}
 	}
 
@@ -122,7 +121,6 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 	      
 	      // Saving the put Instance to the HTable.
 	      hTable.put(p);
-	      System.out.println("data inserted");
 	      
 	      // closing HTable
 	      hTable.close();

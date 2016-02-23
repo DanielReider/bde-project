@@ -1,0 +1,28 @@
+[
+{
+  "pk": 31, 
+  "model": "desktop.document2", 
+  "fields": {
+    "uuid": "47ec335b-6fb1-43ca-0454-e6befe0b4a35", 
+    "extra": "", 
+    "type": "oozie-coordinator2", 
+    "description": "Trains a ml Model every night", 
+    "tags": [], 
+    "is_history": false, 
+    "last_modified": "2016-02-23T05:12:30", 
+    "version": 1, 
+    "owner": [
+      "cloudera"
+    ], 
+    "dependencies": [
+      [
+        "124cd1b3-e6c5-d452-6c4f-1e5b454f0d83", 
+        1, 
+        false
+      ]
+    ], 
+    "data": "{\"properties\": {\"job_xml\": \"\", \"execution\": \"FIFO\", \"end\": \"${end_date}\", \"description\": \"Trains a ml Model every night\", \"frequency_number\": 1, \"workflow\": \"124cd1b3-e6c5-d452-6c4f-1e5b454f0d83\", \"deployment_dir\": \"/user/hue/oozie/workspaces/hue-oozie-1456233129.47\", \"cron_frequency\": \"15 0 * * *\", \"frequency_unit\": \"days\", \"schema_version\": \"uri:oozie:coordinator:0.2\", \"cron_advanced\": false, \"start\": \"${start_date}\", \"timeout\": null, \"timezone\": \"America/Los_Angeles\", \"credentials\": [], \"parameters\": [{\"name\": \"oozie.use.system.libpath\", \"value\": true}, {\"name\": \"start_date\", \"value\": \"2016-02-23T05:12Z\"}, {\"name\": \"end_date\", \"value\": \"2016-03-01T05:12Z\"}], \"sla\": [{\"key\": \"enabled\", \"value\": false}, {\"key\": \"nominal-time\", \"value\": \"${nominal_time}\"}, {\"key\": \"should-start\", \"value\": \"\"}, {\"key\": \"should-end\", \"value\": \"${30 * MINUTES}\"}, {\"key\": \"max-duration\", \"value\": \"\"}, {\"key\": \"alert-events\", \"value\": \"\"}, {\"key\": \"alert-contact\", \"value\": \"\"}, {\"key\": \"notification-msg\", \"value\": \"\"}, {\"key\": \"upstream-apps\", \"value\": \"\"}]}, \"name\": \"Machine Learning Job\", \"end_date\": {\"name\": \"end_date\", \"value\": \"2016-03-01T05:12Z\"}, \"variables\": [], \"start_date\": {\"name\": \"start_date\", \"value\": \"2016-02-23T05:12Z\"}, \"showAdvancedFrequencyUI\": true, \"variablesUI\": [\"parameter\", \"input_path\", \"output_path\"], \"workflowParameters\": [], \"isDirty\": true, \"id\": null, \"uuid\": \"47ec335b-6fb1-43ca-0454-e6befe0b4a35\"}", 
+    "name": "Machine Learning Job"
+  }
+}
+]

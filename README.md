@@ -1,6 +1,7 @@
 # bde-project
 [![Build Status](https://travis-ci.org/dr830029/bde-project.svg?branch=master)](https://travis-ci.org/dr830029/bde-project)
 
+![flow chart](https://github.com/dr830029/bde-project/blob/master/overview.png)
 
 # Project Information
 
@@ -37,6 +38,7 @@
 
 ## Processing
 Die gesammelten Daten werden sowohl mit PIG als auch mit Spark ML aggregiert und aufgearbeitet:
+
 #### Transformation
 * Alle im HDFS vorliegenden Daten müssen Aggregiert und Aufgearbeitet werden um Informationen zu Streamern und Channels zu erhalten.
 * Die vorliegenden Daten werden mit PIG Aggregiert und Aufgearbeitet.
@@ -64,13 +66,132 @@ Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234](ht
 
 #Getting started
 
-Zunächst einmal muss das Github Projekt geklont und kompiliert werden.
+Cloudera VM wird benötigt [CDH5.5](http://www.cloudera.com/downloads/quickstart_vms/5-5.html)
+
+Spark 1.5 auf Spark 1.6 updaten
+
+```
+wget "http://mirrors.ae-online.de/apache/spark/spark-1.6.0/spark-1.6.0-bin-hadoop2.6.tgz"
+tar zxvf spark-1.6.0-bin-hadoop2.6.tgz
+sudo cp spark-1.6.0-bin-hadoop2.6/lib/spark-assembly-1.6.0-hadoop2.6.0.jar /usr/lib/spark/lib/
+sudo rm /usr/lib/spark/lib/spark-assembly.jar
+sudo ln -s /usr/lib/spark/lib/spark-assembly-1.6.0-hadoop2.6.0.jar /usr/lib/spark/lib/spark-assembly.jar
+sudo rm /usr/lib/spark/lib/spark-assembly-1.5.0-cdh5.5.0-hadoop2.6.0-cdh5.5.0.jar
+```
+
+Im nächsten Schritt muss das Github Projekt geklont und kompiliert werden.
 
 ```
 $ git clone https://github.com/dr830029/bde-project.git
 $ cd bde-project/
 $ mvn clean package
 ```
+und die PIG Skripte & Libaries in Hadoop importiert werden
+```
+hadoop fs -mkdir /scripts
+hadoop fs -mkdir /lib
+hadoop fs -put scripts/* /scripts/
+hadoop fs -put /usr/jars/hbase-server-1.0.0-cdh5.5.0.jar /lib/
+```
+
+## Setup Apache
+Aufrufen der Config:
+```
+sudo nano /etc/httpd/conf/httpd.conf
+```
+anpassen des Ports:
+```
+Listen 80
+```
+ändern in:
+```
+Listen 1234
+```
+einfügen in die Config:
+```
+ProxyPass /TwitchAnalyticsBackend http://localhost:1235/TwitchAnalyticsWeb
+ProxyPassReverse /TwitchAnalyticsBackend http://localhost:1235/TwitchAnalyticsWeb
+```
+Dann den Service starten:
+```
+sudo service httpd start
+```
+im nächsten Schritt muss das Frontend kopiert werden:
+```
+sudo cp -r TwitchAnalyticsFrontend/ /var/www/html/
+```
+
+## Setup Wildfly
+für Wildfly wechseln wie in das Homeverzeichnis zurück und laden Wildfly:
+```
+cd ..
+wget "http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.zip"
+unzip wildfly-8.2.0.Final.zip
+mv wildfly-8.2.0.Final WildFly
+sudo nano WildFly/standalone/configuration/standalone-full.xml
+```
+in der Config ändern wir den HTTP.Port:
+```
+<socket-binding name="http" port="${jboss.http.port:8080}"/>
+```
+in
+```
+<socket-binding name="http" port="${jboss.http.port:1235}"/>
+```
+im Anschluss speichern und Wildfly als Service einrichten:
+
+```
+sudo cp WildFly/bin/init.d/wildfly.conf /etc/default/
+sudo nano /etc/default/wildfly.conf
+```
+Dort folgende Configs einstellen und speichern:
+```
+JBOSS_HOME="/home/cloudera/WildFly"
+JBOSS_USER=wildfly
+JBOSS_CONFIG=standalone-full.xml
+JBOSS_CONSOLE_LOG="/var/log/wildfly/console.log"
+```
+
+Service Startskript hinzufügen, Ordner für Logs hinzufügen und Berechtigungen setzten:
+```
+sudo cp WildFly/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly
+sudo mkdir -p /var/log/wildfly
+sudo adduser wildfly
+sudo chown -R wildfly:wildfly /home/cloudera/WildFly/
+sudo chown -R wildfly:wildfly /var/log/wildfly/
+sudo chkconfig --add wildfly
+sudo service wildfly start
+```
+
+Der Server ist gestartet. Der Service kann deployed werden:
+```
+sudo cp bde-project/TwitchAnalytics/target/TwitchAnalytics-0.0.1-SNAPSHOT.war WildFly/standalone/deployments/
+```
+Der Wildfly ist nun eingerichtet. (Machine Learning Model wurde noch nicht generiert und keine Daten im HBase, daher noch nicht funktionsfähig)
+
+## Setup Pipeline
+
+### Einrichten des WeatherPull-Batch-Jobs
+```
+hadoop fs -put /weatherPull/target/weatherPull-0.0.1-jar-with-dependencies.jar /lib/
+```
+#### HBase Tabelle über HUE anlegen:
+
+1. Neue Tabelle erstellen
+2. Tabellenname: weather
+3. Spaltenfamilien: weather
+4. Übermitteln
+
+#### Eingabedaten für WeatherPull anlegen:
+```
+hadoop fs -mkdir -p /data/weather/input
+hadoop fs -put places.csv /data/weather/input/
+```
+#### Import der Oozie Workflows & Coordinators über HUE
+* Import des weatherpull-workflow.json aus dem bde-project/workflows/
+* Import des weatherpull-oozie-job.json aus dem bde-project/workflows/
+
+Die importierten Oozie Coordinators müssen manuell über das HUE gestartet werden.
 
 ### Flume Einrichtung
 
@@ -81,4 +202,35 @@ $ cd bde-project/
 $ sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
 ```
 
-Die flume.properties Datei dient als Template für alle Chats. Beim ausführen der .jar Datei werden die aktuellen Channel eingelesen, die zuvor über den MapReduce Job abgerufen wurden. Für jeden Channel wird auf Grundlage des Templates eine neue .config-Datei erstellt, die als Konfiguration für den Flume-Agent dient. 
+Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. 
+
+```
+$ sudo crontab -e
+5,15,25,35,45,55 * * * * /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
+```
+
+Dieser Job dient als Basis-Job. In der startAgent.sh Datei wird die twitchChatPull-0.0.1-jar-with-dependencies.jar aufgerufen. Diese legt für jeden benötigten und noch nicht gestarteten Flume Agent einen Cron-Job unter dem User cloudera an. 
+
+### Einrichten des TwitchMetaPull-Jobs
+```
+hadoop fs -put externalJars/* /lib/
+hadoop fs -put twitchpull/target/twitchpull-0.0.1-jar-with-dependencies.jar /lib/
+```
+
+#### Import der Oozie Workflows & Coordinators über HUE
+* Import des twitchMetaPull-workflow.json aus dem bde-project/workflows/
+* Import des twitchMetaPull-oozie-job.json aus dem bde-project/workflows/
+
+Die importierten Oozie Coordinatorss müssen manuell über das HUE gestartet werden.
+
+### Machine Learning
+#### Übertragen der ML JAR
+```
+hadoop fs -put /machineLearning/target/machineLearning-0.0.1.jar /lib/
+```
+
+#### Import der Oozie Workflows & Coordinators über HUE
+* Import des ml-workflow.json aus dem bde-project/workflows/
+* Import des ml-oozie-job.json aus dem bde-project/workflows/
+
+Die importierten Oozie Coordinators müssen manuell über das HUE gestartet werden.
