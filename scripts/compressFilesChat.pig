@@ -12,6 +12,10 @@ set output.compression.codec org.apache.hadoop.io.compress.BZip2Codec;
 %default TODAYS_DATE `date +%Y%m%d%H%M`;
 
 --comma seperated list of hdfs directories to compress
+
+--make sure path is not empty
+fs -touchz /data/twitch/chat/processing/chatdata-empty;
+
 input0 = LOAD '/data/twitch/chat/processing/chatdata*' USING PigStorage();
 
 --single output directory

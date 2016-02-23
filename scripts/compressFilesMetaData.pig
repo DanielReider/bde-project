@@ -12,6 +12,7 @@ set output.compression.codec org.apache.hadoop.io.compress.BZip2Codec;
 %default TODAYS_DATE `date +%Y%m%d%H%M`;
 
 --comma seperated list of hdfs directories to compress
+fs -touchz /data/twitch/streammetadata/processing/empty;
 input0 = LOAD '/data/twitch/streammetadata/processing/' USING PigStorage();
 
 --single output directory
