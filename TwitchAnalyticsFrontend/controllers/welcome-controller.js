@@ -52,6 +52,12 @@ welcomeController.controller('WelcomeController',function($scope, $filter, $time
   $scope.stream="rocketbeanstv";
   $scope.date = new Date();
   $scope.loadData = function(){
+    $scope.chatdata=[];
+    $scope.viewersdata=[];
+    if($scope.chatperminapi != undefined)
+      $scope.chatperminapi.refresh();
+    if($scope.viewersperminapi != undefined)
+      $scope.viewersperminapi.refresh();
     $scope.loading = true;
     HBaseService.queryHBase("twitchdata",$scope.stream.toLowerCase() + $filter('date')($scope.date, "yyyyMMdd") + "*").then(function(result){
       $scope.hbaseres = result.data.Row;
@@ -81,7 +87,7 @@ welcomeController.controller('WelcomeController',function($scope, $filter, $time
           }
           if(cell.column.indexOf("viewerspermin") > -1){
             cell.$.forEach(function(chat){
-              time = new Date(chat.timestamp.substr(0,4)+"-"+chat.timestamp.substr(4,2)+"-"+chat.timestamp.substr(6,2)+"T"+chat.timestamp.substr(8,2)+":"+chat.timestamp.substr(10,2)+":00").getTime();
+              time = new Date(chat.timestamp.substr(0,4)+"-"+chat.timestamp.substr(4,2)+"-"+chat.timestamp.substr(6,2)+"T"+chat.timestamp.substr(8,2)+":"+chat.timestamp.substr(10,2)+":00+0100").getTime();
               $scope.viewerspermindata.push([time,chat.viewers]);
             });
           }
