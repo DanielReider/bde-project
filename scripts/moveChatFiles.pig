@@ -6,4 +6,5 @@
  *
  */
 fs -touchz /data/twitch/chat/input/chatdata-empty;
-fs -mv /data/twitch/chat/input/chatdata* /data/twitch/chat/processing/
+fs -rm -f /data/twitch/chat/processing/chatdata-empty;
+fs -mv /data/twitch/chat/input/chatdata* /data/twitch/chat/processing/;

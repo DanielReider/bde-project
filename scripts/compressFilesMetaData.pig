@@ -18,4 +18,4 @@ input0 = LOAD '/data/twitch/streammetadata/processing/' USING PigStorage();
 --single output directory
 STORE input0 INTO '/data/twitch/streammetadata/completed/$TODAYS_DATE' USING PigStorage();
 
-fs -rm -r -f /data/twitch/streammetadata/processing/*
+fs -rm -r -f /data/twitch/streammetadata/processing/*;
