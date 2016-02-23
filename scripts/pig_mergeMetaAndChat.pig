@@ -1,6 +1,7 @@
-REGISTER ./elephant-bird-pig.jar
-REGISTER ./elephant-bird-core.jar
-REGISTER ./elephant-bird-compat.jar
+REGISTER ./elephant-bird-pig-4.13.jar
+REGISTER ./elephant-bird-core-4.13.jar
+REGISTER ./elephant-bird-hadoop-compat-4.13.jar
+REGISTER ./hbase-server-1.0.0-cdh5.5.0.jar
 
 %declare SEQFILE_LOADER 'com.twitter.elephantbird.pig.load.SequenceFileLoader';
 %declare TEXT_CONVERTER 'com.twitter.elephantbird.pig.util.TextConverter';
