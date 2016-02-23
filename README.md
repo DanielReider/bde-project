@@ -37,6 +37,7 @@
 
 ## Processing
 Die gesammelten Daten werden sowohl mit PIG als auch mit Spark ML aggregiert und aufgearbeitet:
+
 #### Transformation
 * Alle im HDFS vorliegenden Daten müssen Aggregiert und Aufgearbeitet werden um Informationen zu Streamern und Channels zu erhalten.
 * Die vorliegenden Daten werden mit PIG Aggregiert und Aufgearbeitet.
@@ -63,6 +64,8 @@ Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234](ht
 * Die über das Web-Interface getriggerten Aktionen werden in real-time ausgeführt.
 
 #Getting started
+
+Cloudera VM wird benötigt [CDH5.5](http://www.cloudera.com/downloads/quickstart_vms/5-5.html)
 
 ## Setup Apache
 Aufrufen der Config:
@@ -147,12 +150,32 @@ $ git clone https://github.com/dr830029/bde-project.git
 $ cd bde-project/
 $ mvn clean package
 ```
-
-
-Im Anschluss müssen die JAR-Files in das Hadoop-Cluster hochgeladen werden, Bsp. für weatherPull:
+### Einrichten des WeatherPull-Batch-Jobs
 ```
-hadoop fs -put /weatherPull/target/weatherPull-0.0.1-jar-with-dependencies.jar /lib
+hadoop fs -mkdir /lib
+hadoop fs -put /weatherPull/target/weatherPull-0.0.1-jar-with-dependencies.jar /lib/
 ```
+#### HBase Tabelle über HUE anlegen:
+
+1. Neue Tabelle erstellen
+2. Tabellenname: weather
+3. Spaltenfamilien: weather
+4. Übermitteln
+
+#### Eingabedaten für WeatherPull anlegen:
+```
+hadoop fs -mkdir -p /data/weather/input
+hadoop fs -put places.csv /data/weather/input/
+```
+#### Import der Oozie Workflows & Coordinators über HUE
+* Import des weatherpull-workflow.json aus dem bde-project/workflows/
+* Import des weatherpull-oozie-job.json aus dem bde-project/workflows/
+
+### Einrichten des TwitchMetaPull-Jobs
+
+#### Import der Oozie Workflows & Coordinators über HUE
+* Import des twitchMetaPull-workflow.json aus dem bde-project/workflows/
+* Import des twitchMetaPull-oozie-job.json aus dem bde-project/workflows/
 
 ### Flume Einrichtung
 
