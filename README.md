@@ -92,6 +92,51 @@ sudo cp -r TwitchAnalyticsFrontend/ /var/www/html/
 ```
 
 ## Setup Wildfly
+für Wildfly wechseln wie in das Homeverzeichnis zurück und laden Wildfly:
+```
+cd ..
+wget "http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.zip"
+unzip wildfly-8.2.0.Final.zip
+mv wildfly-8.2.0.Final WildFly
+sudo nano WildFly/standalone/configuration/standalone-full.xml
+```
+in der Config ändern wir den HTTP.Port:
+```
+<socket-binding name="http" port="${jboss.http.port:8080}"/>
+```
+in
+```
+<socket-binding name="http" port="${jboss.http.port:1235}"/>
+```
+im Anschluss speichern und Wildfly als Service einrichten:
+
+```
+sudo cp WildFly/bin/init.d/wildfly.conf /etc/default/
+sudo nano /etc/default/wildfly.conf
+```
+Dort folgende Configs einstellen und speichern:
+```
+JBOSS_HOME="/home/cloudera/WildFly"
+JBOSS_USER=wildfly
+JBOSS_CONFIG=standalone-full.xml
+JBOSS_CONSOLE_LOG="/var/log/wildfly/console.log"
+```
+
+Service Startskript hinzufügen, Ordner für Logs hinzufügen und Berechtigungen setzten:
+```
+sudo cp WildFly/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly
+sudo mkdir -p /var/log/wildfly
+sudo adduser wildfly
+sudo chown -R wildfly:wildfly /home/cloudera/WildFly/
+sudo chown -R wildfly:wildfly /var/log/wildfly/
+sudo chkconfig --add wildfly
+sudo service wildfly start
+```
+Server ist gestartet. Der Service kann deployed werden:
+```
+sudo cp bde-project/TwitchAnalyticsWeb.war WildFly/standalone/deployments/
+```
+Der Wildfly ist nun eingerichtet. (Machine Learning Model wurde noch nicht generiert und keine Daten im HBase, daher noch nicht funktionsfähig)
 
 ## Setup Pipeline
 
@@ -102,6 +147,7 @@ $ git clone https://github.com/dr830029/bde-project.git
 $ cd bde-project/
 $ mvn clean package
 ```
+
 
 Im Anschluss müssen die JAR-Files in das Hadoop-Cluster hochgeladen werden, Bsp. für weatherPull:
 ```
