@@ -69,6 +69,7 @@ class MapClass extends Mapper<LongWritable, Text, Text, Text> {
 				in.close();
 				success = true;
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.out.println("catch! next try:" + trys);
 				trys++;
 			}
