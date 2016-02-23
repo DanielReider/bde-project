@@ -1,9 +1,11 @@
 package de.fhmuenster.bde.twitchChatPull;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,6 +23,7 @@ public class StartFlumeAgent {
 
 	private static String DESTPATH = "/home/cloudera/chat/config/";
 	private static String SOURCEFILE = "/home/cloudera/bde-project/twitchChatPull/config/flume.properties";
+	private static String output = "";
 
 	public static Properties createProperties() {
 		Properties prop = new Properties();
@@ -154,9 +157,9 @@ public class StartFlumeAgent {
 		}
 
 		try {
-			Runtime.getRuntime()
-					.exec("/usr/lib/flume-ng/bin/flume-ng agent -n a1 -c conf -f " + DESTPATH + chan + ".config &");
-			System.out.println("Agent started successfully");
+			output = output + "0,10,20,30,40,50 * * * * /usr/lib/flume-ng/bin/flume-ng agent -n a1 -c conf -f "
+					+ DESTPATH + chan + ".config\n";
+			System.out.println("Agent added to Job list");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
@@ -167,10 +170,10 @@ public class StartFlumeAgent {
 	public static Boolean agentExists(String chan) {
 		try {
 			FileSystem fs = FileSystem.get(new Configuration());
-			FileStatus[] status = fs
-					.listStatus(new Path("hdfs://quickstart.cloudera:8020/data/twitch/chat/processing"));
+			FileStatus[] status = fs.listStatus(new Path("hdfs://quickstart.cloudera:8020/data/twitch/chat/input"));
 			Path[] paths = FileUtil.stat2Paths(status);
 			for (Path path : paths) {
+				System.out.println(path.toString());
 				if (path.toString().matches(".*_" + chan + "\\..*tmp$"))
 					return true;
 			}
@@ -181,43 +184,74 @@ public class StartFlumeAgent {
 		return false;
 	}
 
-	public static void main(String[] args) {
+	public static void writeToJobFile() {
 		try {
-			FileSystem fs = FileSystem.get(new Configuration());
-			Calendar cal = Calendar.getInstance();
-			Path inFile;
-			int minute = cal.get(Calendar.MINUTE);
-			do {
-				inFile = new Path("hdfs://quickstart.cloudera:8020/data/twitch/streammetadata/processing/"
-						+ cal.get(Calendar.YEAR) + "/" + (cal.get(Calendar.MONTH) + 1) + "/"
-						+ cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.HOUR_OF_DAY) + "/" + minute + "/"
-						+ "part-00000");
-				minute = minute - 1;
-				System.out.println(inFile.toString());
-			} while ((!fs.exists(inFile) && minute >= 0));
-			if (fs.exists(inFile)) {
-				try {
-					FSDataInputStream in = fs.open(inFile);
-					String line;
-					while ((line = in.readLine()) != null) {
-						String[] dataArray = line.split("\t");
-						if (dataArray.length >= 4) {
-							if (agentExists(dataArray[3])) {
-								System.out.println(args[0] + ": Agent already started");
-							} else {
-								runAgent(dataArray[3]);
+			File file = new File("/var/spool/cron/cloudera");
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileWriter fw;
+			fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(output);
+			bw.close();
+			System.out.println("Add Cron-Jobs");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void main(String[] args) {
+		if (args.length > 0) {
+			for (String arg : args) {
+				if (agentExists(arg)) {
+					System.out.println(arg + ": Agent already started");
+				} else {
+					runAgent(arg);
+				}
+			}
+			writeToJobFile();
+		} else {
+			try {
+				FileSystem fs = FileSystem.get(new Configuration());
+				Calendar cal = Calendar.getInstance();
+				Path inFile;
+				int minute = cal.get(Calendar.MINUTE);
+				do {
+					inFile = new Path("hdfs://quickstart.cloudera:8020/data/twitch/streammetadata/processing/"
+							+ cal.get(Calendar.YEAR) + "/" + (cal.get(Calendar.MONTH) + 1) + "/"
+							+ cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.HOUR_OF_DAY) + "/" + minute + "/"
+							+ "part-00000");
+					minute = minute - 1;
+					System.out.println(inFile.toString());
+				} while ((!fs.exists(inFile) && minute >= 0));
+				if (fs.exists(inFile)) {
+					try {
+						FSDataInputStream in = fs.open(inFile);
+						String line;
+						while ((line = in.readLine()) != null) {
+							String[] dataArray = line.split("\t");
+							if (dataArray.length >= 4) {
+								if (agentExists(dataArray[3])) {
+									System.out.println(args[0] + ": Agent already started");
+								} else {
+									runAgent(dataArray[3]);
+								}
+
 							}
 
 						}
-
+					} catch (IOException e) { // TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				} catch (IOException e) { // TODO Auto-generated catch block
-					e.printStackTrace();
 				}
-			}
 
-		} catch (IOException e) { // TODO Auto-generated catch block
-			e.printStackTrace();
+			} catch (IOException e) { // TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+				writeToJobFile();
+			}
 		}
 
 	}
