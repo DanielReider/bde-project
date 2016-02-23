@@ -166,7 +166,10 @@ sudo service wildfly start
 
 Der Server ist gestartet. Der Service kann deployed werden:
 ```
-sudo cp bde-project/TwitchAnalytics/target/TwitchAnalytics-0.0.1-SNAPSHOT.war WildFly/standalone/deployments/
+sudo cp /usr/lib/spark/lib/spark-assembly-1.6.0-hadoop2.6.0.jar TwitchAnalyticsWeb/WebContent/WEB-INF/lib/
+cat  bde-project/TwitchAnalyticsWAR/TwitchAnalyticsWeb.z* >  bde-project/CompletWAR.zip
+unzip  bde-project/CompletWAR.zip
+sudo cp bde-project/TwitchAnalyticsWeb.war WildFly/standalone/deployments/
 ```
 Der Wildfly ist nun eingerichtet. (Machine Learning Model wurde noch nicht generiert und keine Daten im HBase, daher noch nicht funktionsfähig)
 
