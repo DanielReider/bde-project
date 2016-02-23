@@ -202,7 +202,14 @@ $ cd bde-project/
 $ sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
 ```
 
-Die flume.properties Datei dient als Template für alle Chats. Beim ausführen der .jar Datei werden die aktuellen Channel eingelesen, die zuvor über den MapReduce Job abgerufen wurden. Für jeden Channel wird auf Grundlage des Templates eine neue .config-Datei erstellt, die als Konfiguration für den Flume-Agent dient. 
+Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. 
+
+```
+$ sudo crontab -e
+5,15,25,35,45,55 * * * * /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
+```
+
+Dieser Job dient als Basis-Job. In der startAgent.sh Datei wird die twitchChatPull-0.0.1-jar-with-dependencies.jar aufgerufen. Diese legt für jeden benötigten und noch nicht gestarteten Flume Agent einen Cron-Job unter dem User cloudera an. 
 
 ### Einrichten des TwitchMetaPull-Jobs
 ```
