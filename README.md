@@ -221,7 +221,7 @@ Dieser Job dient als Basis-Job. In der startAgent.sh Datei wird die twitchChatPu
 ### Einrichten des TwitchMetaPull-Jobs
 ```
 hadoop fs -put externalJars/* /lib/
-hadoop fs -put twitchpull/target/twitchpull-0.0.1-jar-with-dependencies.jar /lib/
+hadoop fs -put twitchpull/target/twitchpull-0.0.1.jar /lib/
 ```
 
 #### Import der Oozie Workflows & Coordinators über HUE
