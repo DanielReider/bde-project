@@ -1,6 +1,6 @@
-REGISTER '/usr/jars/elephant-bird-pig.jar'
-REGISTER '/usr/jars/elephant-bird-core.jar'
-REGISTER '/usr/jars/elephant-bird-compat.jar'
+REGISTER ./elephant-bird-pig.jar
+REGISTER ./elephant-bird-core.jar
+REGISTER ./elephant-bird-compat.jar
 
 %declare SEQFILE_LOADER 'com.twitter.elephantbird.pig.load.SequenceFileLoader';
 %declare TEXT_CONVERTER 'com.twitter.elephantbird.pig.util.TextConverter';
