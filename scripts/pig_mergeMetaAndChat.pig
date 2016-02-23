@@ -2,12 +2,17 @@ REGISTER ./elephant-bird-pig-4.13.jar
 REGISTER ./elephant-bird-core-4.13.jar
 REGISTER ./elephant-bird-hadoop-compat-4.13.jar
 REGISTER ./hbase-server-1.0.0-cdh5.5.0.jar
+REGISTER ./zookeeper.jar
 
 %declare SEQFILE_LOADER 'com.twitter.elephantbird.pig.load.SequenceFileLoader';
 %declare TEXT_CONVERTER 'com.twitter.elephantbird.pig.util.TextConverter';
 %declare LONG_CONVERTER 'com.twitter.elephantbird.pig.util.LongWritableConverter';
 %declare DATETIME `date +%Y-%m-%dT%H-%M-%S`
 
+set hbase.zookeeper.quorum 'localhost';
+
+--remove temp emptyfile
+fs -rm -f /data/twitch/chat/processing/chatdata-empty;
 
 twitchdata = LOAD '/data/twitch/streammetadata/processing/' using PigStorage(';')
 	AS (channel_id:long, viewers:long, game:chararray, name:chararray,

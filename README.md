@@ -92,6 +92,7 @@ hadoop fs -mkdir /scripts
 hadoop fs -mkdir /lib
 hadoop fs -put scripts/* /scripts/
 hadoop fs -put /usr/jars/hbase-server-1.0.0-cdh5.5.0.jar /lib/
+hadoop fs -put /usr/lib/zookeeper/zookeeper.jar /lib/
 ```
 
 ## Setup Apache
@@ -165,7 +166,10 @@ sudo service wildfly start
 
 Der Server ist gestartet. Der Service kann deployed werden:
 ```
-sudo cp bde-project/TwitchAnalytics/target/TwitchAnalytics-0.0.1-SNAPSHOT.war WildFly/standalone/deployments/
+sudo cp /usr/lib/spark/lib/spark-assembly-1.6.0-hadoop2.6.0.jar TwitchAnalyticsWeb/WebContent/WEB-INF/lib/
+cat  bde-project/TwitchAnalyticsWAR/TwitchAnalyticsWeb.z* >  bde-project/CompletWAR.zip
+unzip  bde-project/CompletWAR.zip
+sudo cp bde-project/TwitchAnalyticsWeb.war WildFly/standalone/deployments/
 ```
 Der Wildfly ist nun eingerichtet. (Machine Learning Model wurde noch nicht generiert und keine Daten im HBase, daher noch nicht funktionsfähig)
 
@@ -202,14 +206,15 @@ $ cd bde-project/
 $ sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
 ```
 
-Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. 
+Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. Zuvor sollte allerdings die startAgent.sh Datei ausführbar gemacht werden.
 
 ```
+$ sudo chmod +x /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
 $ sudo crontab -e
 5,15,25,35,45,55 * * * * /home/cloudera/bde-project/twitchChatPull/config/startAgent.sh
 ```
 
-Dieser Job dient als Basis-Job. In der startAgent.sh Datei wird die twitchChatPull-0.0.1-jar-with-dependencies.jar aufgerufen. Diese legt für jeden benötigten und noch nicht gestarteten Flume Agent einen Cron-Job unter dem User cloudera an. 
+Dieser Job dient als Basis-Job. In der startAgent.sh Datei wird die twitchChatPull-0.0.1-jar-with-dependencies.jar aufgerufen. Diese legt für jeden benötigten und noch nicht gestarteten Flume Agent einen Cron-Job unter dem User cloudera an. Zur Beschränkung der Chats, die ausgelesen werden sollen, können Chats als Argumente übergeben werden. Standardmäßig ist der Abruf auf die Chats nightblue3 und rocketbeanstv beschränkt. Wird die Übergabe der Chats entfernt, werden sämtliche verfügbaren Chats ausgelesen.
 
 ### Einrichten des TwitchMetaPull-Jobs
 ```
