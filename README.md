@@ -203,7 +203,7 @@ Um Flume nutzen zu können, muss die .jar Datei in das lib-Verzeichnis von Flume
 
 ```
 cd bde-project/
-sudo cp twitchChatPull/target/twitchChatPull-0.0.1-jar-with-dependencies.jar /usr/lib/flume-ng/lib/
+sudo cp twitchChatPull/target/twitchChatPull-0.0.1.jar /usr/lib/flume-ng/lib/
 ```
 
 Für das automatisierte Starten der benötigten Flume Agents muss ein Cron-Job angelegt werden. Zuvor sollte allerdings die startAgent.sh Datei ausführbar gemacht werden.
@@ -221,7 +221,7 @@ Dieser Job dient als Basis-Job. In der startAgent.sh Datei wird die twitchChatPu
 ### Einrichten des TwitchMetaPull-Jobs
 ```
 hadoop fs -put externalJars/* /lib/
-hadoop fs -put twitchpull/target/twitchpull-0.0.1.jar /lib/
+hadoop fs -put twitchpull/target/twitchpull-0.0.1-jar-with-dependencies.jar /lib/
 ```
 
 #### Import der Oozie Workflows & Coordinators über HUE
