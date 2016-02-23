@@ -64,12 +64,48 @@ Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234](ht
 
 #Getting started
 
+## Setup Apache
+Aufrufen der Config:
+```
+sudo nano /etc/httpd/conf/httpd.conf
+```
+anpassen des Ports:
+```
+Listen 80
+```
+ändern in:
+```
+Listen 1234
+```
+einfügen in die Config:
+```
+ProxyPass /TwitchAnalyticsBackend http://localhost:1235/TwitchAnalyticsWeb
+ProxyPassReverse /TwitchAnalyticsBackend http://localhost:1235/TwitchAnalyticsWeb
+```
+Dann den Service starten:
+```
+sudo service httpd start
+```
+im nächsten Schritt muss das Frontend kopiert werden:
+```
+sudo cp -r TwitchAnalyticsFrontend/ /var/www/html/
+```
+
+## Setup Wildfly
+
+## Setup Pipeline
+
 Zunächst einmal muss das Github Projekt geklont und kompiliert werden.
 
 ```
 $ git clone https://github.com/dr830029/bde-project.git
 $ cd bde-project/
 $ mvn clean package
+```
+
+Im Anschluss müssen die JAR-Files in das Hadoop-Cluster hochgeladen werden, Bsp. für weatherPull:
+```
+hadoop fs -put /weatherPull/target/weatherPull-0.0.1-jar-with-dependencies.jar /lib
 ```
 
 ### Flume Einrichtung
