@@ -186,7 +186,7 @@ welcomeController.controller('WelcomeController',function($scope, $filter, $time
                 },
                 yAxis: {
                     tickFormat: function(d){
-                        return d3.format(',.0f')(d);
+                        return d3.format('.0f')(d);
                     }
                 },
                 zoom: {
@@ -195,7 +195,7 @@ welcomeController.controller('WelcomeController',function($scope, $filter, $time
                     useFixedDomain: false,
                     useNiceScale: false,
                     horizontalOff: false,
-                    verticalOff: false,
+                    verticalOff: true,
                     unzoomEventType: 'dblclick.zoom'
                 }
             }
@@ -262,7 +262,7 @@ welcomeController.controller('WelcomeController',function($scope, $filter, $time
                          useFixedDomain: false,
                          useNiceScale: false,
                          horizontalOff: false,
-                         verticalOff: false,
+                         verticalOff: true,
                          unzoomEventType: 'dblclick.zoom'
                      }
                  }
