@@ -36,5 +36,6 @@ ml_filterdexport = FILTER ml BY value is not null;
 
 STORE ml INTO '/data/analysis/input/merged/$DATETIME';
 
-fs -mv '/data/analysis/input/merged/$DATETIME/part-r*' '/data/analysis/input/completed/';
-fs -rm '/data/analysis/input/merged/$DATETIME';
+fs -mv /data/analysis/input/merged/$DATETIME/part-r* /data/analysis/input/completed/;
+fs -rm -r -f /data/analysis/input/merged/$DATETIME;
+fs -rm -r -f /data/analysis/input/collecting/*;

@@ -1,7 +1,7 @@
 # bde-project
 [![Build Status](https://travis-ci.org/dr830029/bde-project.svg?branch=master)](https://travis-ci.org/dr830029/bde-project)
 
-![flow chart](https://github.com/dr830029/bde-project/blob/master/overview.png)
+![flow chart](https://github.com/dr830029/bde-project/blob/master/img/overview.png)
 
 # Project Information
 
@@ -53,7 +53,24 @@ Die gesammelten Daten werden sowohl mit PIG als auch mit Spark ML aggregiert und
 * Es wird die Anzahl der Zuschauer prognostiziert
 
 ## Access
-Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234](http://10.60.64.45:1234) (Nur über das VPN erreichbar; siehe Präsentation)
+Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234/TwitchAnalyticsFrontend/#/](http://10.60.64.45:1234/TwitchAnalyticsFrontend/#/) (Nur über das VPN erreichbar; siehe Präsentation).
+
+
+### Chat-/ Streamdaten Analyse
+Die Chat- und Streamdaten werden direkt über die REST-API des HBase abgerufen. Auf Grund der CORS Policy muss dafür die Web Security Des Browsers abgeschaltet werden. 
+Für Google Chrome kann auf dies auf Windows mit dem Flag --disable-web-security erreicht werden.
+Für Google Chrome auf Mac kann dies über folgenden Befehl ausgeschaltet werden (Alle Chrome Instanzen müssen geschlossen sein):
+```
+open /Applications/Google\ Chrome.app/ --args --disable-web-security
+```
+Anschließend sind im Frontend zwei Grafiken sichtbar, welche die zeitliche Entwicklung des Zuschauerzahlen und der Sentimentergebnisse der Chatdaten visualisieren. Über das Formular kann der Name des Streamers und der Tag eingestellt werden.
+![Analytics Frontend](https://github.com/dr830029/bde-project/blob/master/img/AnalyticsFrontend.PNG)
+
+### Viewer Prediction
+Zur Vorhersage der Zuschauerzahlen steht eine separate Eingabemaske zur Verfügung. In dieser können verschiedene benötigte Parameter eingegeben werden. Diese werden anschließend an den WildFly Server gesendet, wo diese mit Wetterprognosen angereichert werden. Daraufhin wird eine Vorhersage der Zuschauerzahlen durch das Machine Learning Model erstellt.
+Die Vorhersage ist wird in Gruppen von je 1000 Zuschauern getroffen. (Z.B. 0 - 1000 Zuschauer, 1000-2000 Zuschauer, 2000-3000 Zuschauer ...)
+[10.60.64.45:1234/TwitchAnalyticsFrontend/#/prediction](http://10.60.64.45:1234/TwitchAnalyticsFrontend/#/prediction)
+![Viewer Prediction](https://github.com/dr830029/bde-project/blob/master/img/ViewerPrediction.PNG)
 
 ## Production
 * Es wurde ein CI-Workflow implementiert, wobei jedes Team Mitglied Local an seinem Modul/Aufgabenbereich gearbeitet hat und ein gemeinsames Git Repo verwendet wurde.
