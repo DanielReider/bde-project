@@ -69,6 +69,7 @@ Anschließend sind im Frontend zwei Grafiken sichtbar, welche die zeitliche Entw
 ### Viewer Prediction
 Zur Vorhersage der Zuschauerzahlen steht eine separate Eingabemaske zur Verfügung. In dieser können verschiedene benötigte Parameter eingegeben werden. Diese werden anschließend an den WildFly Server gesendet, wo diese mit Wetterprognosen angereichert werden. Daraufhin wird eine Vorhersage der Zuschauerzahlen durch das Machine Learning Model erstellt.
 Die Vorhersage ist wird in Gruppen von je 1000 Zuschauern getroffen. (Z.B. 0 - 1000 Zuschauer, 1000-2000 Zuschauer, 2000-3000 Zuschauer ...)
+[10.60.64.45:1234/TwitchAnalyticsFrontend/#/prediction](http://10.60.64.45:1234/TwitchAnalyticsFrontend/#/prediction)
 ![Viewer Prediction](https://github.com/dr830029/bde-project/blob/master/img/ViewerPrediction.PNG)
 
 ## Production
