@@ -53,7 +53,20 @@ Die gesammelten Daten werden sowohl mit PIG als auch mit Spark ML aggregiert und
 * Es wird die Anzahl der Zuschauer prognostiziert
 
 ## Access
-Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234](http://10.60.64.45:1234) (Nur über das VPN erreichbar; siehe Präsentation)
+Die Daten können über ein Web Frontend abgerufen werden: [10.60.64.45:1234/TwitchAnalyticsFrontend/#/](http://10.60.64.45:1234/TwitchAnalyticsFrontend/#/) (Nur über das VPN erreichbar; siehe Präsentation).
+
+
+### Chat-/ Streamdaten Analyse
+Die Chat- und Streamdaten werden direkt über die REST-API des HBase abgerufen. Auf Grund der CORS Policy muss dafür die Web Security Des Browsers abgeschaltet werden. 
+Für Google Chrome kann auf dies auf Windows mit dem Flag --disable-web-security erreicht werden.
+Für Google Chrome auf Mac kann dies über folgenden Befehl ausgeschaltet werden (Alle Chrome Instanzen müssen geschlossen sein):
+```
+
+```
+Anschließend sind im Frontend zwei Grafiken sichtbar, welche die zeitliche Entwicklung des Zuschauerzahlen und der Sentimentergebnisse der Chatdaten visualisieren. Über das Formular kann der Name des Streamers und der Tag eingestellt werden.
+
+
+### Viewer Prediction
 
 ## Production
 * Es wurde ein CI-Workflow implementiert, wobei jedes Team Mitglied Local an seinem Modul/Aufgabenbereich gearbeitet hat und ein gemeinsames Git Repo verwendet wurde.
