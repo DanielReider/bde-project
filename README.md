@@ -224,6 +224,14 @@ hadoop fs -put externalJars/* /lib/
 hadoop fs -put twitchpull/target/twitchpull-0.0.1-jar-with-dependencies.jar /lib/
 ```
 
+#### Erstellen der TwitchData HBase Tabelle
+
+1. Neue Tabelle erstellen
+2. Tabellenname: twitchdata
+3. Spaltenfamilien: general, viewerspermin, chatpermin
+4. Alle Spaltenfamilien als in Memory
+5. Übermitteln
+
 #### Import der Oozie Workflows & Coordinators über HUE
 * Import des aggregateTwitchData-workflow.json aus dem bde-project/workflows/
 * Import des pullTwitchData-workflow.json aus dem bde-project/workflows/
