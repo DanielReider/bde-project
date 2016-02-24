@@ -283,8 +283,8 @@ welcomeController.controller('PredictionController',function($scope, $filter, Pr
   $scope.streamingdate.setDate($scope.streamingdate.getDate()+1);
   $scope.predict = function(){
     $scope.loading = true;
-    $scope.channel = $scope.channel.replace(" ","_").replace(",","_")
-    $scope.game = $scope.game.replace(" ","_").replace(",","_")
+    $scope.channel = $scope.channel.replace(/ /g,"_").replace(/,/g,"_")
+    $scope.game = $scope.game.replace(/ /g,"_").replace(/,/g,"_")
     PredictionService.predict($scope.channel, $scope.game, $scope.duration, $scope.daytime, $scope.frames, $filter('date')($scope.streamingdate,"yyyy-MM-dd HH:mm:ss")).then(function(result){
       $scope.predictionclass = result.data;
       $scope.predictionResult = ($scope.predictionclass*1000) + " bis " + (($scope.predictionclass + 1) * 1000);
